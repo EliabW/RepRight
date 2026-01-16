@@ -4,14 +4,68 @@ import {
   FieldLabel,
   FieldSeparator,
   FieldSet,
-} from "../components/ui/field";
-import { Card } from "../components/ui/card";
-import { Input } from "../components/ui/input";
-import { Button } from "../components/ui/button";
+} from "@/components/ui/field";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Spinner } from "@/components/ui/spinner";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { authService } from "@/services/authService";
+import { useState } from "react";
+import ErrorMessage from "@/components/common/ErrorMessage";
+import axios from "axios";
 
 function Login() {
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await authService.login({
+        userEmail: email,
+        userPassword: password,
+      });
+      login(
+        {
+          userID: response.userID,
+          userEmail: response.userEmail,
+          userGivenName: response.userGivenName,
+          userFamilyName: response.userFamilyName,
+        },
+        response.token
+      );
+      navigate("/dashboard");
+    } catch (err: unknown) {
+      let message = "Login failed. Please try again.";
+
+      if (axios.isAxiosError<{ message: string }>(err)) {
+        message = err.response?.data?.message ?? message;
+      }
+
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const onEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    if (error) setError(null);
+  };
+
+  const onPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    if (error) setError(null);
+  };
 
   return (
     <>
@@ -34,17 +88,19 @@ function Login() {
         <h2 className="text-subheading text-center mb-6">
           Sign in to your account
         </h2>
-        <form>
+        <form onSubmit={handleSubmit}>
           <FieldGroup>
-            <FieldSet>
+            <FieldSet disabled={loading}>
               <FieldGroup>
                 <FieldSeparator />
-
+                {error && <ErrorMessage message={error} />}
                 <Field>
                   <FieldLabel className="text-subheading" htmlFor="email">
                     Email
                   </FieldLabel>
                   <Input
+                    onChange={onEmailChange}
+                    value={email}
                     className="bg-neutral-secondary"
                     placeholder="Enter your email"
                     type="email"
@@ -58,6 +114,8 @@ function Login() {
                     Password
                   </FieldLabel>
                   <Input
+                    onChange={onPasswordChange}
+                    value={password}
                     className="bg-neutral-secondary"
                     type="password"
                     placeholder="Enter your password"
@@ -75,8 +133,14 @@ function Login() {
                   Forgot password?
                 </Button>
                 <Field>
-                  <Button type="submit" className="w-full">
-                    Login
+                  <Button type="submit" disabled={loading} className="w-full">
+                    {loading ? (
+                      <>
+                        <Spinner /> Logging in...
+                      </>
+                    ) : (
+                      "Login"
+                    )}
                   </Button>
                 </Field>
                 <p className="text-center text-sm">
