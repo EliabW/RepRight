@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>backend</name>
+    </assembly>
+    <members>
+        <member name="M:backend.Controllers.UserController.GetUser(System.Int32)">
+            <summary>
+            Get a user by ID
+            </summary>
+            <response code="200">Returns the user</response>
+            <response code="400">If the user ID is invalid</response>
+            <response code="404">If the user is not found</response>
+        </member>
+        <member name="M:backend.Controllers.UserController.GetCurrentUser">
+            <summary>
+            Get current authenticated user
+            </summary>
+            <status code="200">Returns the current user</status>
+            <status code="401">If the user is not authenticated</status>
+            <status code="404">If the user is not found</status>
+        </member>
+        <member name="M:backend.Controllers.UserController.CreateUser(backend.DTOs.CreateUserRequest)">
+            <summary>
+            Creates a new user
+            </summary>
+            <response code="201">Returns the newly created user</response>
+            <response code="400">If the user data is invalid</response>
+        </member>
+        <member name="M:backend.Controllers.UserController.Login(backend.DTOs.LoginRequest)">
+            <summary>
+            Login a user and return a JWT token
+            </summary>
+            <response code="200">Returns the authenticated user</response>
+            <response code="401">If the credentials are incorrect</response>
+        </member>
+        <member name="M:backend.Controllers.UserController.UpdateUser(System.Int32,backend.DTOs.UpdateUserRequest)">
+            <summary>
+            Update user information
+            </summary>
+            <response code="200">Returns the updated user</response>
+            <response code="400">If the user ID is invalid</response>
+            <response code="404">If the user is not found</response>
+        </member>
+        <member name="M:backend.Controllers.UserController.ChangePassword(System.Int32,backend.DTOs.ChangePasswordRequest)">
+            <summary>
+            Change user password
+            </summary>
+            <response code="200">If the password was successfully changed</response>
+            <response code="400">If the user ID is invalid or current password is incorrect</response>
+            <response code="404">If the user is not found</response>
+        </member>
+        <member name="M:backend.Controllers.UserController.DeleteUser(System.Int32)">
+            <summary>
+            Delete a user by ID
+            </summary>
+            <response code="204">If the user was successfully deleted</response>
+            <response code="400">If the user ID is invalid</response>
+            <response code="404">If the user is not found</response>
+        </member>
+    </members>
+</doc>
