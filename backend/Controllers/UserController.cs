@@ -61,6 +61,9 @@ public class UserController : ControllerBase
             UserEmail = user.UserEmail,
             CreatedDateTime = user.CreatedDateTime,
             UpdatedDateTime = user.UpdatedDateTime,
+            CurrentStreak = user.CurrentStreak,
+            LongestStreak = user.LongestStreak,
+            DarkMode = user.DarkMode,
         };
 
         return response;
@@ -97,6 +100,9 @@ public class UserController : ControllerBase
             CreatedDateTime = user.CreatedDateTime,
             UpdatedDateTime = user.UpdatedDateTime,
             LastLoginDateTime = user.LastLoginDateTime,
+            CurrentStreak = user.CurrentStreak,
+            LongestStreak = user.LongestStreak,
+            DarkMode = user.DarkMode,
         };
 
         return response;
@@ -131,12 +137,18 @@ public class UserController : ControllerBase
             UserPassword = hashedPassword,
             CreatedDateTime = DateTime.UtcNow,
             UpdatedDateTime = DateTime.UtcNow,
+            CurrentStreak = 0,
+            LongestStreak = 0,
+            DarkMode = false,
         };
 
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
         var token = JwtTokenGenerator.GenerateToken(user);
+
+        // update login streak
+        StreakHelper.UpdateLoginStreak(user);
 
         // update last login datetime
         user.LastLoginDateTime = DateTime.UtcNow;
@@ -150,6 +162,7 @@ public class UserController : ControllerBase
             UserFamilyName = user.UserFamilyName,
             UserEmail = user.UserEmail,
             Token = token,
+            DarkMode = user.DarkMode,
         };
 
         return CreatedAtAction(nameof(GetUser), new { id = user.UserID }, response);
@@ -182,6 +195,9 @@ public class UserController : ControllerBase
 
         var token = JwtTokenGenerator.GenerateToken(user);
 
+        // update login streak
+        StreakHelper.UpdateLoginStreak(user);
+
         // update last login datetime
         user.LastLoginDateTime = DateTime.UtcNow;
         await _context.SaveChangesAsync();
@@ -195,6 +211,7 @@ public class UserController : ControllerBase
                 UserGivenName = user.UserGivenName,
                 UserFamilyName = user.UserFamilyName,
                 Token = token,
+                DarkMode = user.DarkMode,
             }
         );
     }
@@ -272,6 +289,9 @@ public class UserController : ControllerBase
             UserEmail = user.UserEmail,
             CreatedDateTime = user.CreatedDateTime,
             UpdatedDateTime = user.UpdatedDateTime,
+            CurrentStreak = user.CurrentStreak,
+            LongestStreak = user.LongestStreak,
+            DarkMode = user.DarkMode,
         };
     }
 
@@ -343,5 +363,35 @@ public class UserController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Toggle dark mode for the current user
+    /// </summary>
+    /// <response code="200">Returns the updated dark mode preference</response>
+    /// <response code="401">If the user is not authenticated</response>
+    /// <response code="404">If the user is not found</response>
+    [HttpPut("{id}/dark-mode")]
+    [Authorize]
+    [RequireOwnership]
+    public async Task<ActionResult> ToggleDarkMode(int id, [FromBody] DarkModeRequest request)
+    {
+        if (id <= 0)
+        {
+            return BadRequest(new { message = "Invalid user ID." });
+        }
+
+        var user = await _context.Users.FindAsync(id);
+        if (user == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
+        user.DarkMode = request.DarkMode;
+        user.UpdatedDateTime = DateTime.UtcNow;
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new { darkMode = user.DarkMode });
     }
 }

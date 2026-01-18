@@ -6,6 +6,7 @@ import {
   FieldSet,
 } from "@/components/ui/field";
 import { Card } from "@/components/ui/card";
+import { PasswordInput } from "@/components/ui/password_input";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
@@ -40,8 +41,9 @@ function Login() {
           userEmail: response.userEmail,
           userGivenName: response.userGivenName,
           userFamilyName: response.userFamilyName,
+          darkMode: response.darkMode,
         },
-        response.token
+        response.token,
       );
       navigate("/dashboard");
     } catch (err: unknown) {
@@ -113,11 +115,10 @@ function Login() {
                   <FieldLabel className="text-subheading" htmlFor="password">
                     Password
                   </FieldLabel>
-                  <Input
+                  <PasswordInput
                     onChange={onPasswordChange}
                     value={password}
                     className="bg-neutral-secondary"
-                    type="password"
                     placeholder="Enter your password"
                     id="password"
                     required

@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/home/braed/projects/RepRight/backend/backend.csproj": {}
+    "/home/braeden/projects/RepRight/backend/backend.csproj": {}
   },
   "projects": {
-    "/home/braed/projects/RepRight/backend/backend.csproj": {
+    "/home/braeden/projects/RepRight/backend/backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/braed/projects/RepRight/backend/backend.csproj",
+        "projectUniqueName": "/home/braeden/projects/RepRight/backend/backend.csproj",
         "projectName": "backend",
-        "projectPath": "/home/braed/projects/RepRight/backend/backend.csproj",
-        "packagesPath": "/home/braed/.nuget/packages/",
-        "outputPath": "/home/braed/projects/RepRight/backend/obj/",
+        "projectPath": "/home/braeden/projects/RepRight/backend/backend.csproj",
+        "packagesPath": "/home/braeden/.nuget/packages/",
+        "outputPath": "/home/braeden/projects/RepRight/backend/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/braed/.nuget/NuGet/NuGet.Config"
+          "/home/braeden/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"

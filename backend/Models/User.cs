@@ -31,4 +31,10 @@ public class User
     public DateTime UpdatedDateTime { get; set; } = DateTime.UtcNow;
 
     public DateTime? LastLoginDateTime { get; set; }
+
+    public int CurrentStreak { get; set; } = 0;
+
+    public int LongestStreak { get; set; } = 0;
+
+    public bool DarkMode { get; set; }
 }

@@ -3,6 +3,7 @@ export interface User {
   userGivenName: string;
   userFamilyName: string;
   userEmail: string;
+  darkMode?: boolean;
 }
 
 export interface UserResponse {
@@ -13,6 +14,9 @@ export interface UserResponse {
   createdDateTime: string;
   updatedDateTime: string;
   lastLoginDateTime: string | null;
+  currentStreak: number;
+  longestStreak: number;
+  darkMode: boolean;
 }
 
 export interface CreateUserRequest {

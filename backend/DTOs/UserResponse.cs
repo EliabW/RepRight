@@ -9,4 +9,7 @@ public class UserResponse
     public DateTime CreatedDateTime { get; set; }
     public DateTime UpdatedDateTime { get; set; }
     public DateTime? LastLoginDateTime { get; set; }
+    public int CurrentStreak { get; set; }
+    public int LongestStreak { get; set; }
+    public bool DarkMode { get; set; }
 }
