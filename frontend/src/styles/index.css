@@ -88,13 +88,17 @@
 
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: "Inter", sans-serif;
   }
 }
 
 /* used for gradient on auth cards */
 @layer utilities {
   .bg-gradient-card {
-    background: linear-gradient(to bottom, rgb(var(--neutral-standard)), rgb(var(--tertiary)));
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--neutral-standard)),
+      rgb(var(--tertiary))
+    );
   }
 }

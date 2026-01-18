@@ -15,6 +15,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { authService } from "@/services/authService";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import { Spinner } from "@/components/ui/spinner";
+import { PasswordInput } from "@/components/ui/password_input";
 import axios from "axios";
 
 function Register() {
@@ -55,12 +56,13 @@ function Register() {
           userEmail: response.userEmail,
           userGivenName: response.userGivenName,
           userFamilyName: response.userFamilyName,
+          darkMode: response.darkMode,
         },
-        response.token
+        response.token,
       );
       navigate("/dashboard");
     } catch (err: unknown) {
-      let message = "Login failed. Please try again.";
+      let message = "Registration failed. Please try again.";
 
       if (axios.isAxiosError<{ message: string }>(err)) {
         message = err.response?.data?.message ?? message;
@@ -137,12 +139,11 @@ function Register() {
                   <FieldLabel className="text-subheading" htmlFor="password">
                     Password
                   </FieldLabel>
-                  <Input
+                  <PasswordInput
                     onChange={handleChange}
                     value={formData.password}
                     className="bg-neutral-secondary"
                     id="password"
-                    type="password"
                     placeholder="Enter your password"
                     required
                   />
@@ -154,12 +155,11 @@ function Register() {
                   >
                     Confirm Password
                   </FieldLabel>
-                  <Input
+                  <PasswordInput
                     onChange={handleChange}
                     value={formData.confirmPassword}
                     className="bg-neutral-secondary"
                     id="confirmPassword"
-                    type="password"
                     placeholder="Confirm your password"
                     required
                   />

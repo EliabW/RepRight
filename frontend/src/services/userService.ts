@@ -16,16 +16,20 @@ export const userService = {
   },
   changePassword: async (
     userId: number,
-    passwordData: ChangePasswordRequest
+    passwordData: ChangePasswordRequest,
   ) => {
     const response = await api.put<void>(
       `/User/${userId}/password`,
-      passwordData
+      passwordData,
     );
     return response.data;
   },
   deleteUser: async (userId: number) => {
     const response = await api.delete<void>(`/User/${userId}`);
+    return response.data;
+  },
+  toggleDarkMode: async (userId: number, darkMode: boolean) => {
+    const response = await api.put(`/User/${userId}/dark-mode`, { darkMode });
     return response.data;
   },
 };

@@ -17,12 +17,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setToken(null);
     localStorage.removeItem("user");
     localStorage.removeItem("token");
+    localStorage.removeItem("darkMode");
+    document.documentElement.classList.remove("dark");
   };
 
   // load token from localstorage on initial render
   useEffect(() => {
     const initAuth = async (): Promise<void> => {
       const storedToken = localStorage.getItem("token");
+      const storedDarkMode = localStorage.getItem("darkMode");
+
+      // apply dark mode immediately to prevent flash
+      if (storedDarkMode === "true") {
+        document.documentElement.classList.add("dark");
+      }
 
       if (!storedToken) {
         setLoading(false);
@@ -35,6 +43,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(user);
         setToken(storedToken);
         localStorage.setItem("user", JSON.stringify(user));
+
+        // sync dark mode from database (in case it changed on another device)
+        if (user.darkMode) {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("darkMode", "true");
+        } else {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("darkMode", "false");
+        }
       } catch {
         clearAuth();
       } finally {
@@ -47,6 +64,15 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   // set user data and token on login
   const login = (userData: User, authToken: string): void => {
+    // apply dark mode on login
+    if (userData.darkMode) {
+      document.documentElement.classList.add("dark");
+      localStorage.setItem("darkMode", "true");
+    } else {
+      document.documentElement.classList.remove("dark");
+      localStorage.setItem("darkMode", "false");
+    }
+
     setUser(userData);
     setToken(authToken);
     localStorage.setItem("user", JSON.stringify(userData));

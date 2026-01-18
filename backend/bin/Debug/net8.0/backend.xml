@@ -58,5 +58,13 @@
             <response code="400">If the user ID is invalid</response>
             <response code="404">If the user is not found</response>
         </member>
+        <member name="M:backend.Controllers.UserController.ToggleDarkMode(System.Int32,backend.DTOs.DarkModeRequest)">
+            <summary>
+            Toggle dark mode for the current user
+            </summary>
+            <response code="200">Returns the updated dark mode preference</response>
+            <response code="401">If the user is not authenticated</response>
+            <response code="404">If the user is not found</response>
+        </member>
     </members>
 </doc>

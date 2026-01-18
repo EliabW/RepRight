@@ -7,4 +7,5 @@ public class LoginResponse
     public required string UserFamilyName { get; set; }
     public required string UserEmail { get; set; }
     public required string Token { get; set; }
+    public bool DarkMode { get; set; }
 }

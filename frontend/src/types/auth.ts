@@ -11,6 +11,7 @@ export interface LoginResponse {
   userFamilyName: string;
   userEmail: string;
   token: string;
+  darkMode?: boolean;
 }
 
 export interface AuthContextValue {
