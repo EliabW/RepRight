@@ -4,7 +4,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { userService } from "@/services/userService";
 import { useState, useEffect } from "react";
 
-export function DarkModeToggle() {
+interface DarkModeToggleProps {
+  // full for desktop dropdown, icon for mobile menu
+  variant?: "icon" | "full";
+}
+
+export function DarkModeToggle({ variant = "full" }: DarkModeToggleProps) {
   const { user, token, updateUser } = useAuth();
   const [isDark, setIsDark] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -58,15 +63,39 @@ export function DarkModeToggle() {
     }
   };
 
+  if (variant === "icon") {
+    return (
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={toggleDarkMode}
+        disabled={loading}
+        aria-label="Toggle dark mode"
+        className="bg-neutral-secondary dark:bg-black dark:text-white text-secondary hover:bg-neutral-200 dark:hover:bg-neutral-900"
+      >
+        {isDark ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+      </Button>
+    );
+  }
+
   return (
     <Button
-      variant="ghost"
-      size="icon"
       onClick={toggleDarkMode}
       disabled={loading}
       aria-label="Toggle dark mode"
+      className="bg-neutral-secondary dark:bg-black dark:text-white text-secondary hover:bg-neutral-200 dark:hover:bg-neutral-900"
     >
-      {isDark ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+      {isDark ? (
+        <div className="flex items-center gap-2">
+          <Moon className="h-5 w-5" />
+          Dark Mode
+        </div>
+      ) : (
+        <div className="flex items-center gap-2">
+          <Sun className="h-5 w-5" />
+          Light Mode
+        </div>
+      )}
     </Button>
   );
 }
