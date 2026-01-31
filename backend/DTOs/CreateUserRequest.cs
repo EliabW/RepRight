@@ -19,9 +19,9 @@ public class CreateUserRequest
 
     [Required(ErrorMessage = "Password is required")]
     [MaxLength(100)]
-    [RegularExpression(
-        @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$",
-        ErrorMessage = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number."
-    )]
+    // [RegularExpression(
+    //     @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$",
+    //     ErrorMessage = "Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, and one number."
+    // )]
     public required string UserPassword { get; set; }
 }
