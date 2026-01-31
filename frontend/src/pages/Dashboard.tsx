@@ -8,10 +8,68 @@ import { TableRow } from "@/components/features/dashboard/TableRow";
 import { FormScoreProgressChart } from "@/components/features/dashboard/FormScoreProgressChart";
 import { ExerciseBreakdownChart } from "@/components/features/dashboard/ExerciseBreakdownChart";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { useEffect, useState } from "react";
+import { sessionService } from "@/services/sessionService";
+import type { SessionResponse } from "@/types/session";
 
 function Dashboard() {
+  const [sessions, setSessions] = useState<SessionResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    const fetchSessions = async () => {
+      try {
+        setIsLoading(true);
+        // fetch sessions from the currently logged in user
+        const sessions = await sessionService.getAllSessions();
+        setSessions(sessions);
+        setError(null);
+      } catch (error) {
+        console.error("Error fetching sessions:", error);
+        setError("Failed to load sessions");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchSessions();
+  }, []);
+
   const { user } = useAuth();
+
+  const stats = {
+    recentScore:
+      sessions.length > 0
+        ? (sessions[0].sessionScore?.toFixed(1) ?? "N/A")
+        : "N/A",
+    totalExercises: sessions.length,
+    loginStreak: user?.currentStreak ?? 0,
+  };
+
+  const latestSessionWithFeedback = sessions.find(
+    (s) => s.sessionFeedback && s.sessionFeedback.trim() !== "",
+  );
+
+  const recentSessions = sessions.slice(0, 20);
+
   const isDesktop = useMediaQuery("(min-width: 768px)");
+
+  if (isLoading) {
+    return (
+      <div className="p-8 flex items-center justify-center">
+        <p>Loading dashboard...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-8 flex items-center justify-center">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8">
       {/* header */}
@@ -28,19 +86,19 @@ function Dashboard() {
       <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
         <StatCard
           title="Recent Score"
-          value="8.2"
+          value={stats.recentScore}
           secondValue="/10"
           icon={Trophy}
         />
         <StatCard
           title="Exercises Completed"
-          value="24"
+          value={stats.totalExercises.toString()}
           secondValue=""
           icon={Dumbbell}
         />
         <StatCard
           title="Login Streak"
-          value="10"
+          value={stats.loginStreak.toString()}
           secondValue="Days"
           icon={Flame}
         />
@@ -78,12 +136,17 @@ function Dashboard() {
         <Card className="p-4">
           <h1 className="text-md text-subheading mb-2">Latest Feedback</h1>
           <Separator className="mb-4" />
-          <FeedbackCard
-            exercise="Squat"
-            feedback="Great depth and form! Remember to keep your back straight and engage your core throughout the movement."
-            imageSrc="../../images/squat.png"
-            score={9}
-          />
+          {latestSessionWithFeedback ? (
+            <FeedbackCard
+              exercise={latestSessionWithFeedback.sessionType}
+              feedback={latestSessionWithFeedback.sessionFeedback!}
+              // map based on exercise type
+              imageSrc="../../images/squat.png"
+              score={latestSessionWithFeedback.sessionScore ?? 0}
+            />
+          ) : (
+            <p className="text-sm text-gray-500">No feedback available yet.</p>
+          )}
         </Card>
       </div>
       {/* exercise feedback */}
@@ -93,20 +156,20 @@ function Dashboard() {
           <Card className="p-4">
             <h1 className="text-md text-subheading mb-2">Exercise Feedback</h1>
             <Separator className="mb-4" />
-            <TableRow
-              exercise="Squat"
-              date="1/5/2026"
-              reps="10"
-              seconds={30}
-              score={9}
-            />
-            <TableRow
-              exercise="Push Up"
-              date="1/4/2026"
-              reps="15"
-              seconds={30}
-              score={4.2}
-            />
+            {recentSessions.length > 0 ? (
+              recentSessions.map((session) => (
+                <TableRow
+                  key={session.sessionID}
+                  exercise={session.sessionType}
+                  date={new Date(session.startTime).toLocaleDateString()}
+                  reps={session.sessionReps.toString()}
+                  seconds={session.sessionDurationSec}
+                  score={session.sessionScore ?? 0}
+                />
+              ))
+            ) : (
+              <p className="text-sm text-subheading">No recent sessions.</p>
+            )}
           </Card>
         )}
       </div>
