@@ -4,7 +4,7 @@ import LoadingPage from "@/components/common/LoadingPage";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
-function ProtectedRoute() {
+function ProtectedRoute({ session = false }: { session?: unknown }) {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
@@ -17,11 +17,16 @@ function ProtectedRoute() {
 
   return (
     <>
-      <Header />
-      <main className="pt-20">
-        <Outlet />
-      </main>
-      <Footer />
+      {!session && (
+        <>
+          <Header />
+          <main className="pt-20">
+            <Outlet />
+          </main>
+          <Footer />
+        </>
+      )}
+      {session && <Outlet />}
     </>
   );
 }
