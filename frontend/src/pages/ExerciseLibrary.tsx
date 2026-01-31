@@ -6,6 +6,20 @@ function ExerciseLibrary() {
 
   return (
     <div>
+      
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+        <img
+          src="/android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[700px] opacity-[0.04] dark:hidden"
+        />
+        <img
+          src="/white-android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[520px] opacity-[0.06] hidden dark:block"
+        />
+      </div>
+      
       <div className="p-6 max-w-8xl mx-auto">
         <div className="grid xl:grid-cols-2 gap-6">
           <ExerciseCard

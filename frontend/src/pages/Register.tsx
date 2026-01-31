@@ -17,6 +17,7 @@ import ErrorMessage from "@/components/common/ErrorMessage";
 import { Spinner } from "@/components/ui/spinner";
 import { PasswordInput } from "@/components/ui/password_input";
 import axios from "axios";
+import { FancyButton } from "@/components/ui/fancybutton";
 
 function Register() {
   const navigate = useNavigate();
@@ -80,8 +81,34 @@ function Register() {
   };
 
   return (
-    <>
-      <Card className="max-w-sm mx-auto mt-10 p-8 border-0 shadow-lg">
+    <div className="min-h-screen flex items-center justify-center relative py-8">
+      {/* Background logo */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+        <img
+          src="/android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[700px] opacity-[0.04] dark:hidden"
+        />
+        <img
+          src="/white-android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[520px] opacity-[0.06] hidden dark:block"
+        />
+      </div>
+
+      <Card className="max-w-sm w-full mx-auto p-8 border-0 shadow-lg">
+        <>
+          <img
+            src="/android-chrome-512x512.png"
+            alt="RepRight Logo"
+            className="w-40 h-40 mx-auto dark:hidden"
+          />
+          <img
+            src="/white-android-chrome-512x512.png"
+            alt="RepRight Logo"
+            className="w-40 h-40 mx-auto hidden dark:block"
+          />
+        </>
         <h1 className="text-secondary text-3xl font-bold text-center">
           Create an account
         </h1>
@@ -91,7 +118,7 @@ function Register() {
         <form onSubmit={handleSubmit}>
           <FieldGroup>
             <FieldSet disabled={loading}>
-              <FieldGroup className="gap-5">
+              <FieldGroup className="gap-3">
                 <FieldSeparator />
                 {error && <ErrorMessage message={error} />}
                 <Field>
@@ -164,13 +191,13 @@ function Register() {
                     required
                   />
                 </Field>
-                <FieldDescription className="text-xs opacity-50 text-center">
+                <FieldDescription className="text-xs text-center">
                   Your information is completely confidential and will never be
                   shared with third parties.
                 </FieldDescription>
                 <FieldSeparator />
                 <Field>
-                  <Button type="submit" disabled={loading} className="w-full">
+                  <FancyButton type="submit" disabled={loading} className="w-full">
                     {loading ? (
                       <>
                         <Spinner /> Registering...
@@ -178,7 +205,7 @@ function Register() {
                     ) : (
                       "Register"
                     )}
-                  </Button>
+                  </FancyButton>
                 </Field>
                 <p className="text-center text-sm">
                   Already have an account?{" "}
@@ -196,7 +223,7 @@ function Register() {
           </FieldGroup>
         </form>
       </Card>
-    </>
+    </div>
   );
 }
 export default Register;

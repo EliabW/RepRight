@@ -16,6 +16,7 @@ import { authService } from "@/services/authService";
 import { useState } from "react";
 import ErrorMessage from "@/components/common/ErrorMessage";
 import axios from "axios";
+import { FancyButton } from "@/components/ui/fancybutton";
 
 function Login() {
   const navigate = useNavigate();
@@ -70,8 +71,22 @@ function Login() {
   };
 
   return (
-    <>
-      <Card className="max-w-sm mx-auto mt-10 p-8 border-0 shadow-lg">
+    <div className="min-h-screen flex items-center justify-center relative">
+      {/* Background logo */}
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+        <img
+          src="/android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[700px] opacity-[0.04] dark:hidden"
+        />
+        <img
+          src="/white-android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[520px] opacity-[0.06] hidden dark:block"
+        />
+      </div>
+
+      <Card className="max-w-sm w-full mx-auto p-8 border-0 shadow-lg">
         <>
           <img
             src="/android-chrome-512x512.png"
@@ -134,7 +149,7 @@ function Login() {
                   Forgot password?
                 </Button>
                 <Field>
-                  <Button type="submit" disabled={loading} className="w-full">
+                  <FancyButton type="submit" disabled={loading} className="w-full">
                     {loading ? (
                       <>
                         <Spinner /> Logging in...
@@ -142,7 +157,7 @@ function Login() {
                     ) : (
                       "Login"
                     )}
-                  </Button>
+                  </FancyButton>
                 </Field>
                 <p className="text-center text-sm">
                   Don't have an account?{" "}
@@ -160,7 +175,7 @@ function Login() {
           </FieldGroup>
         </form>
       </Card>
-    </>
+    </div>
   );
 }
 export default Login;

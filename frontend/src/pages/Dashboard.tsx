@@ -15,11 +15,11 @@ import p5 from "p5";
 import Sketch from "react-p5";
 import {
   Dialog,
-  DialogDescription,
   DialogTitle,
   DialogContent,
-  DialogOverlay,
 } from "@/components/ui/dialog";
+import "animate.css";
+
 interface Keypoint {
   x: number;
   y: number;
@@ -31,12 +31,14 @@ interface Pose {
   keypoints: Keypoint[];
   skeleton: unknown[][];
 }
+
 interface ML5BodyPose {
   detectStart: (
     video: HTMLVideoElement,
     callback: (results: Pose[]) => void,
   ) => Promise<void>;
 }
+
 declare global {
   interface Window {
     ml5: {
@@ -124,6 +126,20 @@ function Dashboard() {
 
   return (
     <div className="p-8">
+
+<div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+        <img
+          src="/android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[700px] opacity-[0.05] dark:hidden"
+        />
+        <img
+          src="/white-android-chrome-512x512.png"
+          alt="RepRight Logo"
+          className="w-[520px] opacity-[0.06] hidden dark:block"
+        />
+      </div>
+
       {/* header */}
       <Dialog open={false}>
         {/* <DialogOverlay className="backdrop-blur-xs" /> */}
@@ -163,8 +179,8 @@ function Dashboard() {
       </Dialog>
 
       <div className="flex">
-        <h1 className="text-5xl text-secondary pr-2">Welcome back,</h1>
-        <span className="text-5xl text-primary font-bold">
+        <h1 className="text-5xl text-secondary pr-2 animate__animated animate__bounce">Welcome back,</h1>
+        <span className="text-5xl text-primary font-bold animate__animated animate__bounce">
           {user?.userGivenName}
         </span>
         <h1 className="text-5xl text-secondary">!</h1>
@@ -172,7 +188,7 @@ function Dashboard() {
       <h2 className="text-7sm">Track your progress and improve your form.</h2>
 
       {/* stat cards */}
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-10 mt-8">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-10 mt-8 animate__animated animate__zoomIn">
         <StatCard
           title="Recent Score"
           value={stats.recentScore}
@@ -193,7 +209,7 @@ function Dashboard() {
         />
       </div>
       {/* performance overview and latest feedback */}
-      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-20">
+      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-20 animate__animated animate__zoomIn">
         {/* hide if on mobile */}
         {isDesktop && (
           <Card className="p-20">
@@ -223,8 +239,8 @@ function Dashboard() {
           </Card>
         )}
         <Card className="p-20">
-          <h1 className="text-md text-subheading mb-2">Latest Feedback</h1>
-          
+
+          <h1 className="text-md text-subheading mb-2 ">Latest Feedback</h1>
           <Separator className="mb-8" />
           {latestSessionWithFeedback ? (
             <FeedbackCard
@@ -240,10 +256,10 @@ function Dashboard() {
         </Card>
       </div>
       {/* exercise feedback */}
-      <div className="grid grid-cols-1 gap-6 mt-20">
+      <div className="grid grid-cols-1 gap-6 mt-20 animate__animated animate__bounceInLeft animate__delay-1s">
         {/* hide if on mobile */}
         {isDesktop && (
-          <Card className="p-4">
+          <Card className="p-4 ">
             <h1 className="text-md text-subheading mb-2">Exercise Feedback</h1>
             <Separator className="mb-4" />
             {recentSessions.length > 0 ? (
