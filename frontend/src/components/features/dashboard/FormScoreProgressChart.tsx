@@ -7,25 +7,48 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import type { SessionResponse } from "@/types/session";
 
-// sample data
-const data = [
-  { month: "Jan", score: 6.5 },
-  { month: "Feb", score: 7.0 },
-  { month: "Mar", score: 7.2 },
-  { month: "Apr", score: 7.5 },
-  { month: "May", score: 7.8 },
-  { month: "Jun", score: 8.0 },
-  { month: "Aug", score: 8.2 },
-  { month: "Oct", score: 8.0 },
-  { month: "Nov", score: 8.2 },
-  { month: "Dec", score: 7.8 },
-];
+interface FormScoreProgressChartProps {
+  sessions?: SessionResponse[];
+}
 
-export function FormScoreProgressChart() {
+export function FormScoreProgressChart({
+  sessions = [],
+}: FormScoreProgressChartProps) {
+  const chartData = sessions
+    .filter((s) => s.sessionScore !== null && s.sessionScore !== undefined)
+    .sort(
+      (a, b) =>
+        new Date(a.startTime).getTime() - new Date(b.startTime).getTime(),
+    )
+    .map((session, index) => ({
+      sessionNumber: index + 1,
+      score: session.sessionScore!,
+      date: new Date(session.startTime).toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+      }),
+    }));
+
+  const scores = chartData.map((d) => d.score);
+  const minScore = scores.length > 0 ? Math.floor(Math.min(...scores)) : 0;
+  const maxScore = scores.length > 0 ? Math.ceil(Math.max(...scores)) : 10;
+
+  const yMin = Math.max(0, minScore - 1);
+  const yMax = Math.min(10, maxScore + 1);
+
+  if (chartData.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p className="text-sm text-subheading">No score data available</p>
+      </div>
+    );
+  }
+
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <AreaChart data={data}>
+      <AreaChart data={chartData}>
         <defs>
           <linearGradient id="scoreGradient" x1="0" y1="0" x2="0" y2="1">
             <stop offset="5%" stopColor="#976E4C" stopOpacity={0.4} />
@@ -38,14 +61,13 @@ export function FormScoreProgressChart() {
           opacity={0.3}
         />
         <XAxis
-          dataKey="month"
+          dataKey="sessionNumber"
           stroke="rgb(var(--subheading))"
           style={{ fontSize: "12px" }}
           tick={{ fill: "rgb(var(--subheading))" }}
         />
         <YAxis
-          domain={[6, 9]}
-          ticks={[6.0, 6.5, 7.0, 7.5, 8.0, 8.5]}
+          domain={[yMin, yMax]}
           stroke="rgb(var(--subheading))"
           style={{ fontSize: "12px" }}
           tick={{ fill: "rgb(var(--subheading))" }}
@@ -57,11 +79,12 @@ export function FormScoreProgressChart() {
             borderRadius: "8px",
             color: "rgb(var(--secondary))",
           }}
-          formatter={(value?: number) => [
-            <span style={{ color: "rgb(var(--secondary))" }}>
-              Score: {value?.toFixed(1)}
-            </span>,
-          ]}
+          labelFormatter={(label, payload) => {
+            if (payload && payload[0]) {
+              return `Session ${payload[0].payload.sessionNumber} - ${payload[0].payload.date}`;
+            }
+            return `Session ${label}`;
+          }}
           labelStyle={{ color: "rgb(var(--subheading))" }}
         />
         <Area

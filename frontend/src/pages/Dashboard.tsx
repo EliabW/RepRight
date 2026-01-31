@@ -13,13 +13,8 @@ import { sessionService } from "@/services/sessionService";
 import type { SessionResponse } from "@/types/session";
 import p5 from "p5";
 import Sketch from "react-p5";
-import {
-  Dialog,
-  DialogDescription,
-  DialogTitle,
-  DialogContent,
-  DialogOverlay,
-} from "@/components/ui/dialog";
+import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
+import { ScoreBadge } from "@/components/features/dashboard/ScoreBadge";
 interface Keypoint {
   x: number;
   y: number;
@@ -45,10 +40,24 @@ declare global {
   }
 }
 
+const exerciseImageMap: Record<string, string> = {
+  Squat: "../../images/squat.png",
+  Pushup: "../../images/pushup.png",
+  Deadlift: "../../images/deadlift.png",
+  BenchPress: "../../images/benchpress.png",
+};
+
+const getExerciseImage = (exerciseType: string): string => {
+  return exerciseImageMap[exerciseType] || "../../images/default-exercise.png";
+};
+
 function Dashboard() {
   const [sessions, setSessions] = useState<SessionResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedSession, setSelectedSession] =
+    useState<SessionResponse | null>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
   useEffect(() => {
     const fetchSessions = async () => {
       try {
@@ -87,6 +96,11 @@ function Dashboard() {
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
+  const handleViewSession = (session: SessionResponse) => {
+    setSelectedSession(session);
+    setIsDialogOpen(true);
+  };
+
   if (isLoading) {
     return (
       <div className="p-8 flex items-center justify-center">
@@ -123,22 +137,42 @@ function Dashboard() {
   };
 
   return (
-    <div className="p-8">
+    <div className="p-12">
       {/* header */}
-      <Dialog open={false}>
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         {/* <DialogOverlay className="backdrop-blur-xs" /> */}
         <DialogContent className="sm:max-w-2xl max-h-[90vh] bg-card-primary overflow-y-auto shadow-2xl rounded-xl">
-          <DialogTitle>Squat Analysis</DialogTitle>
+          <div className="flex justify-between">
+            <DialogTitle className="text-3xl">
+              {selectedSession?.sessionType} Analysis
+            </DialogTitle>
+            {/* Use ScoreBadge component */}
+            <ScoreBadge
+              score={selectedSession?.sessionScore ?? 0}
+              text="Score"
+            />
+          </div>
           {/* <DialogDescription className="-mt-1 mb-1 ">
             Edit the details of the transaction
           </DialogDescription> */}
-          <div className="mt-4  p-4 rounded-lg flex flex-row justify-between">
+          <div className="p-4 rounded-lg flex flex-row justify-between">
             <Card className="bg-card-secondary p-4 max-w-xs rounded-xl">
-              <p>01/05/2026</p>
-              <br />
-              <p>8 reps</p>
-              <br />
-              <p>30 seconds</p>
+              <p className="text-sm text-subheading">Date</p>
+              <p className="font-semibold mb-3">
+                {selectedSession?.startTime
+                  ? new Date(selectedSession.startTime).toLocaleDateString()
+                  : "N/A"}
+              </p>
+
+              <p className="text-sm text-subheading">Reps</p>
+              <p className="font-semibold mb-3">
+                {selectedSession?.sessionReps ?? 0}
+              </p>
+
+              <p className="text-sm text-subheading">Duration</p>
+              <p className="font-semibold mb-3">
+                {selectedSession?.sessionDurationSec ?? 0} seconds
+              </p>
             </Card>
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
             {/* @ts-ignore */}
@@ -146,18 +180,22 @@ function Dashboard() {
               <Sketch preload={preload} setup={setup} draw={draw} />
             </Card>
           </div>
-          <div className="w-[100%] h-px bg-slate-400 rounded-full"></div>
-          <h1 className="text-lg font-bold mt-4">Feedback</h1>
-          <p className="mt-2 mb-4 max-w-xs">
-            Good job! Keep your back straighter on the descent and drive through
-            your heels on the way up
+          <div className="w-[100%] h-px bg-subtle rounded-full"></div>
+          <h1 className="text-lg font-bold">Feedback</h1>
+          <p className="max-w-xs">
+            {selectedSession?.sessionFeedback ||
+              "No feedback available for this session."}
           </p>
-          <div className="w-[100%] h-px bg-slate-400 rounded-full"></div>
+          <div className="w-[100%] h-px bg-subtle rounded-full"></div>
           <h1 className="text-lg font-bold mt-4 mb-4">
-            Squat Form Score Progress
+            {selectedSession?.sessionType} Form Score Progress
           </h1>
           <div className="w-[90%] h-[180px]">
-            <FormScoreProgressChart />
+            <FormScoreProgressChart
+              sessions={sessions.filter(
+                (s) => s.sessionType === selectedSession?.sessionType,
+              )}
+            />
           </div>
         </DialogContent>
       </Dialog>
@@ -208,7 +246,7 @@ function Dashboard() {
                   Form Score Progress
                 </h2>
                 <Card className="h-56 flex items-center justify-center bg-card-secondary rounded-xl pr-8 pt-4">
-                  <FormScoreProgressChart />
+                  <FormScoreProgressChart sessions={sessions} />
                 </Card>
               </div>
               <div>
@@ -216,7 +254,7 @@ function Dashboard() {
                   Exercise Breakdown
                 </h2>
                 <Card className="h-56 flex items-center justify-center bg-card-secondary rounded-xl pr-8 pt-4">
-                  <ExerciseBreakdownChart />
+                  <ExerciseBreakdownChart sessions={sessions} />
                 </Card>
               </div>
             </div>
@@ -229,9 +267,9 @@ function Dashboard() {
             <FeedbackCard
               exercise={latestSessionWithFeedback.sessionType}
               feedback={latestSessionWithFeedback.sessionFeedback!}
-              // map based on exercise type
-              imageSrc="../../images/squat.png"
+              imageSrc={getExerciseImage(latestSessionWithFeedback.sessionType)}
               score={latestSessionWithFeedback.sessionScore ?? 0}
+              onViewDetails={() => handleViewSession(latestSessionWithFeedback)}
             />
           ) : (
             <p className="text-sm text-gray-500">No feedback available yet.</p>
@@ -254,6 +292,7 @@ function Dashboard() {
                   reps={session.sessionReps.toString()}
                   seconds={session.sessionDurationSec}
                   score={session.sessionScore ?? 0}
+                  onViewDetails={() => handleViewSession(session)}
                 />
               ))
             ) : (
