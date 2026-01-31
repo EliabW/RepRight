@@ -16,16 +16,16 @@ function Dashboard() {
     <div className="p-8">
       {/* header */}
       <div className="flex">
-        <h1 className="text-3xl text-secondary pr-2">Welcome back,</h1>
-        <span className="text-3xl text-primary font-bold">
+        <h1 className="text-5xl text-secondary pr-2">Welcome back,</h1>
+        <span className="text-5xl text-primary font-bold">
           {user?.userGivenName}
         </span>
-        <h1 className="text-3xl text-secondary">!</h1>
+        <h1 className="text-5xl text-secondary">!</h1>
       </div>
-      <h2 className="text-sm">Track your progress and improve your form.</h2>
+      <h2 className="text-7sm">Track your progress and improve your form.</h2>
 
       {/* stat cards */}
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-10 mt-8">
         <StatCard
           title="Recent Score"
           value="8.2"
@@ -46,10 +46,10 @@ function Dashboard() {
         />
       </div>
       {/* performance overview and latest feedback */}
-      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
+      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-20">
         {/* hide if on mobile */}
         {isDesktop && (
-          <Card className="p-4">
+          <Card className="p-20">
             <h1 className="text-md text-subheading mb-2">
               Performance Overview
             </h1>
@@ -75,9 +75,9 @@ function Dashboard() {
             </div>
           </Card>
         )}
-        <Card className="p-4">
+        <Card className="p-20">
           <h1 className="text-md text-subheading mb-2">Latest Feedback</h1>
-          <Separator className="mb-4" />
+          <Separator className="mb-8" />
           <FeedbackCard
             exercise="Squat"
             feedback="Great depth and form! Remember to keep your back straight and engage your core throughout the movement."
@@ -87,7 +87,7 @@ function Dashboard() {
         </Card>
       </div>
       {/* exercise feedback */}
-      <div className="grid grid-cols-1 gap-6 mt-8">
+      <div className="grid grid-cols-1 gap-6 mt-20">
         {/* hide if on mobile */}
         {isDesktop && (
           <Card className="p-4">

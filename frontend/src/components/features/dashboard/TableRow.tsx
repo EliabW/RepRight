@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { FancyButton } from "@/components/ui/fancybutton";
 import { ScoreBadge } from "./ScoreBadge";
 import { Card } from "@/components/ui/card";
 
@@ -35,7 +35,7 @@ export function TableRow({
       {/* score and button */}
       <div className="flex items-center gap-4">
         <ScoreBadge score={score} />
-        <Button>View Full Report</Button>
+        <FancyButton>View Full Report</FancyButton>
       </div>
     </Card>
   );
