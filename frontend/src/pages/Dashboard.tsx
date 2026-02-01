@@ -150,6 +150,11 @@ function Dashboard() {
       </div>
     );
   }
+  const formatTime = (s: number) => {
+    const m = Math.floor(s / 60);
+    const sec = s % 60;
+    return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
 
   const setup = (p5: p5, canvasParentRef: Element) => {
     p5.createCanvas(350, 200).parent(canvasParentRef);
@@ -214,7 +219,7 @@ function Dashboard() {
 
               <p className="text-sm text-subheading">Duration</p>
               <p className="font-semibold mb-3">
-                {selectedSession?.sessionDurationSec ?? 0} seconds
+                {formatTime(selectedSession?.sessionDurationSec ?? 0)} seconds
               </p>
             </Card>
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
