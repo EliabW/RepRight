@@ -72,6 +72,18 @@ function Login() {
   return (
     <>
       <Card className="max-w-sm mx-auto mt-10 p-8 border-0 shadow-lg">
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+          <img
+            src="/android-chrome-512x512.png"
+            alt="RepRight Logo"
+            className="w-[700px] opacity-[0.04] dark:hidden"
+          />
+          <img
+            src="/white-android-chrome-512x512.png"
+            alt="RepRight Logo"
+            className="w-[520px] opacity-[0.06] hidden dark:block"
+          />
+        </div>
         <>
           <img
             src="/android-chrome-512x512.png"
