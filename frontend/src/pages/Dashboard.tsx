@@ -16,6 +16,17 @@ import Sketch from "react-p5";
 import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
 import { ScoreBadge } from "@/components/features/dashboard/ScoreBadge";
 import { useLocation } from "react-router-dom";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+
 interface Keypoint {
   x: number;
   y: number;
@@ -61,6 +72,10 @@ function Dashboard() {
   const [selectedSession, setSelectedSession] =
     useState<SessionResponse | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [viewMode, setViewMode] = useState<"progression" | "reps">(
+    "progression",
+  );
+
   useEffect(() => {
     if (location.state?.newId) {
       window.history.replaceState({}, document.title);
@@ -135,6 +150,7 @@ function Dashboard() {
       </div>
     );
   }
+
   const setup = (p5: p5, canvasParentRef: Element) => {
     p5.createCanvas(350, 200).parent(canvasParentRef);
   };
@@ -155,25 +171,33 @@ function Dashboard() {
     console.log("ml5 available:", window.ml5);
   };
 
+  // prep rep scores data for bar graph
+  const getRepScoresData = () => {
+    if (!selectedSession?.repScores || selectedSession.repScores.length === 0) {
+      return [];
+    }
+
+    return selectedSession.repScores.map((score, index) => ({
+      rep: `Rep ${index + 1}`,
+      score: score,
+    }));
+  };
+
   return (
     <div className="p-12">
       {/* header */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        {/* <DialogOverlay className="backdrop-blur-xs" /> */}
         <DialogContent className="sm:max-w-2xl max-h-[90vh] bg-card-primary overflow-y-auto shadow-2xl rounded-xl">
           <div className="flex justify-between">
             <DialogTitle className="text-3xl">
               {selectedSession?.sessionType} Analysis
             </DialogTitle>
-            {/* Use ScoreBadge component */}
             <ScoreBadge
               score={selectedSession?.sessionScore ?? 0}
               text="Score"
             />
           </div>
-          {/* <DialogDescription className="-mt-1 mb-1 ">
-            Edit the details of the transaction
-          </DialogDescription> */}
+
           <div className="p-4 rounded-lg flex flex-row justify-between">
             <Card className="bg-card-secondary p-4 max-w-xs rounded-xl">
               <p className="text-sm text-subheading">Date</p>
@@ -199,22 +223,80 @@ function Dashboard() {
               <Sketch preload={preload} setup={setup} draw={draw} />
             </Card>
           </div>
+
           <div className="w-[100%] h-px bg-subtle rounded-full"></div>
           <h1 className="text-lg font-bold">Feedback</h1>
           <p className="max-w-xs">
             {selectedSession?.sessionFeedback ||
               "No feedback available for this session."}
           </p>
+
           <div className="w-[100%] h-px bg-subtle rounded-full"></div>
-          <h1 className="text-lg font-bold mt-4 mb-4">
-            {selectedSession?.sessionType} Form Score Progress
-          </h1>
-          <div className="w-[90%] h-[180px]">
-            <FormScoreProgressChart
-              sessions={sessions.filter(
-                (s) => s.sessionType === selectedSession?.sessionType,
-              )}
-            />
+
+          <div className="flex justify-between items-center mt-4">
+            <h1 className="text-lg font-bold">
+              {viewMode === "progression"
+                ? `${selectedSession?.sessionType} Form Score Progress`
+                : "Rep Scores"}
+            </h1>
+            <ToggleGroup
+              type="single"
+              value={viewMode}
+              onValueChange={(value) => {
+                if (value) setViewMode(value as "progression" | "reps");
+              }}
+            >
+              <ToggleGroupItem
+                value="progression"
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+              >
+                Progression
+              </ToggleGroupItem>
+              <ToggleGroupItem
+                className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+                value="reps"
+              >
+                Rep Scores
+              </ToggleGroupItem>
+            </ToggleGroup>
+          </div>
+
+          <div className="w-[90%] h-[180px] mt-4">
+            {viewMode === "progression" ? (
+              <FormScoreProgressChart
+                sessions={sessions.filter(
+                  (s) => s.sessionType === selectedSession?.sessionType,
+                )}
+              />
+            ) : (
+              <>
+                {selectedSession?.repScores &&
+                selectedSession.repScores.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={getRepScoresData()}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="rep" />
+                      <YAxis domain={[0, 10]} />
+                      <Tooltip />
+                      <Bar
+                        dataKey="score"
+                        fill="#976E4C"
+                        onClick={(data, index) => {
+                          console.log("Clicked bar:", data, "Index:", index);
+                        }}
+                        cursor="pointer"
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="flex items-center justify-center h-full">
+                    <p className="text-sm text-subheading">
+                      No rep scores available for this session
+                    </p>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </DialogContent>
       </Dialog>
