@@ -418,7 +418,11 @@ function LiveSession() {
       sessionType: exercise,
       sessionReps: counterRef.current,
       sessionScore: avg,
-      repScores: scores.current,
+      reps: scores.current.map((score, index) => ({
+        repNumber: index + 1,
+        repScore: score,
+        frames: [],
+      })),
 
       // sessionScore: 0, // Default score, can be calculated based on form
       sessionFeedback: getPushupFeedback(avg), // Default feedback
