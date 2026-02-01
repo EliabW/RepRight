@@ -389,6 +389,8 @@ function LiveSession() {
                   sessionType: exercise,
                   sessionReps: repCount,
                   sessionScore: avg,
+                  repScores: scores.current,
+
                   // sessionScore: 0, // Default score, can be calculated based on form
                   // sessionFeedback: "", // Default feedback
                   sessionDurationSec: elapsedTime,
