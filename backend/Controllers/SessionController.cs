@@ -91,6 +91,10 @@ public class SessionsController : ControllerBase
         {
             return NotFound(new { message = "User not found." });
         }
+        // Console.WriteLine("Request:" + request.ToString());
+        // Console.WriteLine("RepScores:" + request.RepScores.ToString());
+        // Console.WriteLine("Serial:" + JsonSerializer.Serialize(request.RepScores));
+
 
         var session = new Sessions
         {

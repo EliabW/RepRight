@@ -260,7 +260,8 @@ function LiveSession() {
                 const predition = await pushup.predict(normalizedSequence);
                 console.log("Prediction:", predition);
                 if (predition) {
-                  const rounded = Math.round(predition * 10) / 10;
+                  const mul = predition * 10;
+                  const rounded = parseFloat(mul.toFixed(1));
 
                   scores.current.push(rounded);
                 }
