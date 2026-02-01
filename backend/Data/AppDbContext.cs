@@ -10,4 +10,6 @@ public class AppDbContext : DbContext
 
     public DbSet<User> Users { get; set; }
     public DbSet<Sessions> Sessions { get; set; }
+    public DbSet<Rep> Reps { get; set; }
+    public DbSet<Frame> Frames { get; set; }
 }
