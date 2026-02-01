@@ -1,3 +1,5 @@
+import type { CreateRepRequest, RepResponse } from "./rep";
+
 export interface Session {
   sessionID: number;
   userID: number;
@@ -18,7 +20,7 @@ export interface SessionResponse {
   sessionScore: number;
   sessionFeedback: string;
   sessionDurationSec: number;
-  repScores: number[];
+  reps?: RepResponse[];
 }
 
 export interface CreateSessionRequest {
@@ -28,7 +30,7 @@ export interface CreateSessionRequest {
   sessionScore?: number;
   sessionFeedback?: string;
   sessionDurationSec?: number;
-  repScores?: number[];
+  reps?: CreateRepRequest[];
 }
 
 export interface UpdateSessionRequest {
@@ -38,5 +40,5 @@ export interface UpdateSessionRequest {
   sessionScore?: number;
   sessionFeedback?: string;
   sessionDurationSec?: number;
-  repScores?: number[];
+  reps?: CreateRepRequest[];
 }

@@ -10,5 +10,5 @@ public class SessionResponse
     public string? SessionFeedback { get; set; }
     public int? SessionDurationSec { get; set; }
 
-    public List<double>? RepScores { get; set; }
+    public List<RepResponse>? Reps { get; set; }
 }

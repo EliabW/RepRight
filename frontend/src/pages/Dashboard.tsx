@@ -97,16 +97,12 @@ function Dashboard() {
       }
     };
 
-    fetchSessions().then(() => {
+    fetchSessions().then(async () => {
       if (id > 0) {
-        console.log(id, sessions.length);
-        for (const item of sessions) {
-          console.log(item.sessionID);
-          if (item.sessionID === id) {
-            setSelectedSession(item);
-          }
-        }
         setIsDialogOpen(true);
+
+        const fullSession = await sessionService.getSession(id);
+        setSelectedSession(fullSession);
       }
     });
   }, []);
@@ -130,9 +126,17 @@ function Dashboard() {
 
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  const handleViewSession = (session: SessionResponse) => {
-    setSelectedSession(session);
-    setIsDialogOpen(true);
+  const handleViewSession = async (session: SessionResponse) => {
+    try {
+      setIsDialogOpen(true);
+      setSelectedSession(null);
+
+      const fullSession = await sessionService.getSession(session.sessionID);
+
+      setSelectedSession(fullSession);
+    } catch (err) {
+      console.error("Failed to fetch full session:", err);
+    }
   };
 
   if (isLoading) {
@@ -178,13 +182,13 @@ function Dashboard() {
 
   // prep rep scores data for bar graph
   const getRepScoresData = () => {
-    if (!selectedSession?.repScores || selectedSession.repScores.length === 0) {
+    if (!selectedSession?.reps || selectedSession.reps.length === 0) {
       return [];
     }
 
-    return selectedSession.repScores.map((score, index) => ({
-      rep: `Rep ${index + 1}`,
-      score: score,
+    return selectedSession.reps.map((rep) => ({
+      rep: `Rep ${rep.repNumber}`,
+      score: rep.repScore ?? 0,
     }));
   };
 
@@ -275,22 +279,14 @@ function Dashboard() {
               />
             ) : (
               <>
-                {selectedSession?.repScores &&
-                selectedSession.repScores.length > 0 ? (
+                {selectedSession?.reps?.length ? (
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={getRepScoresData()}>
                       <CartesianGrid strokeDasharray="3 3" />
                       <XAxis dataKey="rep" />
                       <YAxis domain={[0, 10]} />
                       <Tooltip />
-                      <Bar
-                        dataKey="score"
-                        fill="#976E4C"
-                        onClick={(data, index) => {
-                          console.log("Clicked bar:", data, "Index:", index);
-                        }}
-                        cursor="pointer"
-                      />
+                      <Bar dataKey="score" fill="#976E4C" cursor="pointer" />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (

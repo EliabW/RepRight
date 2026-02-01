@@ -18,5 +18,5 @@ public class CreateSessionRequest
 
     public int? SessionDurationSec { get; set; }
 
-    public List<double>? RepScores { get; set; }
+    public List<CreateRepRequest>? Reps { get; set; }
 }
