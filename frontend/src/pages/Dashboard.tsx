@@ -127,7 +127,7 @@ function Dashboard() {
   return (
     <div className="p-8">
 
-<div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+<div className="fixed inset-0 flex items-center justify-center pointer-events-none ">
         <img
           src="/android-chrome-512x512.png"
           alt="RepRight Logo"
@@ -209,16 +209,16 @@ function Dashboard() {
         />
       </div>
       {/* performance overview and latest feedback */}
-      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-20 animate__animated animate__zoomIn">
+      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-20 animate__animated animate__zoomIn ">
         {/* hide if on mobile */}
         {isDesktop && (
-          <Card className="p-20">
+          <Card className="p-20 bg-card-primary/60 backdrop-blur-md">
             <h1 className="text-md text-subheading mb-2">
               Performance Overview
             </h1>
             <Separator className="mb-2" />
             {/* placeholder for performance charts */}
-            <div className="flex grid grid-cols-2 gap-4 px-2">
+            <div className="flex grid grid-cols-2 gap-4 px-2 ">
               <div>
                 <h2 className="py-2 text-sm text-subheading">
                   Form Score Progress
@@ -238,7 +238,7 @@ function Dashboard() {
             </div>
           </Card>
         )}
-        <Card className="p-20">
+        <Card className="p-20 bg-card-primary/60 backdrop-blur-md">
 
           <h1 className="text-md text-subheading mb-2 ">Latest Feedback</h1>
           <Separator className="mb-8" />
@@ -259,7 +259,7 @@ function Dashboard() {
       <div className="grid grid-cols-1 gap-6 mt-20 animate__animated animate__bounceInLeft animate__delay-1s">
         {/* hide if on mobile */}
         {isDesktop && (
-          <Card className="p-4 ">
+          <Card className="p-4 bg-card-primary/60 backdrop-blur-md">
             <h1 className="text-md text-subheading mb-2">Exercise Feedback</h1>
             <Separator className="mb-4" />
             {recentSessions.length > 0 ? (

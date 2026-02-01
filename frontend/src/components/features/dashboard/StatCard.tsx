@@ -15,7 +15,7 @@ export function StatCard({
   icon: Icon,
 }: ScoreCardProps) {
   return (
-    <Card className="relative p-4 overflow-hidden">
+    <Card className="relative p-4 overflow-hidden bg-card-primary/60 backdrop-blur-md">
       {/* title */}
       <h2 className="text-md text-subheading">{title}</h2>
 

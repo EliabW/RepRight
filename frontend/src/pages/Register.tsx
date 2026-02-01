@@ -52,15 +52,17 @@ function Register() {
         userPassword: formData.password,
       });
       login(
-        {
-          userID: response.userID,
-          userEmail: response.userEmail,
-          userGivenName: response.userGivenName,
-          userFamilyName: response.userFamilyName,
-          darkMode: response.darkMode,
-        },
-        response.token,
-      );
+  {
+    userID: response.userID,
+    userEmail: response.userEmail,
+    userGivenName: response.userGivenName,
+    userFamilyName: response.userFamilyName,
+    darkMode: response.darkMode,
+    currentStreak: 0,
+    longestStreak: 0,
+  },
+  response.token,
+);
       navigate("/dashboard");
     } catch (err: unknown) {
       let message = "Registration failed. Please try again.";

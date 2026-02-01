@@ -18,7 +18,7 @@ const data = [
 ];
 
 // color palette for bars
-const colors = ["#ef4444", "#3b82f6", "#22c55e", "#f59e0b"];
+const colors = ["#976E4C", "#8F5E38", "#976E4C", "#8F5E38"];
 
 export function ExerciseBreakdownChart() {
   return (

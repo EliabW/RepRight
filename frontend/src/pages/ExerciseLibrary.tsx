@@ -7,7 +7,7 @@ function ExerciseLibrary() {
   return (
     <div>
       
-      <div className="fixed inset-0 flex items-center justify-center pointer-events-none">
+      <div className="fixed inset-0 flex items-center justify-center pointer-events-none ">
         <img
           src="/android-chrome-512x512.png"
           alt="RepRight Logo"
@@ -20,7 +20,7 @@ function ExerciseLibrary() {
         />
       </div>
       
-      <div className="p-6 max-w-8xl mx-auto">
+      <div className="p-6 max-w-8xl mx-auto animate__animated animate__zoomIn">
         <div className="grid xl:grid-cols-2 gap-6">
           <ExerciseCard
             title="Squat"
