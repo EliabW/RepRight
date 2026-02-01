@@ -6,6 +6,8 @@ interface FeedbackCardProps {
   feedback: string;
   imageSrc: string;
   score: number;
+  // click handler for view full report button
+  onViewDetails?: () => void;
 }
 
 export function FeedbackCard({
@@ -13,6 +15,7 @@ export function FeedbackCard({
   feedback,
   imageSrc,
   score,
+  onViewDetails,
 }: FeedbackCardProps) {
   return (
     <div className="bg-card-secondary border border-subtle p-6 rounded-xl flex flex-col sm:flex-row gap-6">

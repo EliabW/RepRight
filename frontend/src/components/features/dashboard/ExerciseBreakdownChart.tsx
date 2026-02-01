@@ -8,22 +8,57 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import type { SessionResponse } from "@/types/session";
 
-// sample data
-const data = [
-  { exercise: "Squat", count: 12 },
-  { exercise: "Push Up", count: 18 },
-  { exercise: "Bench Press", count: 15 },
-  { exercise: "Deadlift", count: 22 },
-];
+interface ExerciseBreakdownChartProps {
+  sessions?: SessionResponse[];
+}
 
 // color palette for bars
-const colors = ["#976E4C", "#8F5E38", "#976E4C", "#8F5E38"];
 
-export function ExerciseBreakdownChart() {
+const colors = [
+  "#ef4444",
+  "#3b82f6",
+  "#22c55e",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+];
+
+export function ExerciseBreakdownChart({
+  sessions = [],
+}: ExerciseBreakdownChartProps) {
+  // Group sessions by exercise type and count them
+  const exerciseCounts = sessions.reduce(
+    (acc, session) => {
+      const exerciseType = session.sessionType;
+      acc[exerciseType] = (acc[exerciseType] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
+
+  // Convert to array format for chart
+  const chartData = Object.entries(exerciseCounts)
+    .map(([exercise, count]) => ({
+      exercise,
+      count,
+    }))
+    .sort((a, b) => b.count - a.count); // Sort by count descending
+
+  // Empty state
+  if (chartData.length === 0) {
+    return (
+      <div className="w-full h-full flex items-center justify-center">
+        <p className="text-sm text-subheading">No exercise data available</p>
+      </div>
+    );
+  }
+
+
   return (
     <ResponsiveContainer width="100%" height="100%">
-      <BarChart data={data}>
+      <BarChart data={chartData}>
         <CartesianGrid
           strokeDasharray="3 3"
           stroke="rgb(var(--subtle))"
@@ -32,13 +67,14 @@ export function ExerciseBreakdownChart() {
         <XAxis
           dataKey="exercise"
           stroke="rgb(var(--subheading))"
-          style={{ fontSize: "12px" }}
+          style={{ fontSize: "10px" }}
           tick={{ fill: "rgb(var(--subheading))" }}
         />
         <YAxis
           stroke="rgb(var(--subheading))"
           style={{ fontSize: "12px" }}
           tick={{ fill: "rgb(var(--subheading))" }}
+          allowDecimals={false}
         />
         <Tooltip
           contentStyle={{
@@ -46,16 +82,11 @@ export function ExerciseBreakdownChart() {
             border: "1px solid rgb(var(--subtle))",
             borderRadius: "8px",
           }}
-          formatter={(value?: number) => [
-            <span style={{ color: "rgb(var(--secondary))" }}>
-              Count: {value}
-            </span>,
-          ]}
           labelStyle={{ color: "rgb(var(--subheading))" }}
           cursor={{ fill: "#976e4c1a" }}
         />
         <Bar dataKey="count" radius={[8, 8, 0, 0]}>
-          {data.map((_entry, index) => (
+          {chartData.map((_entry, index) => (
             <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />
           ))}
         </Bar>

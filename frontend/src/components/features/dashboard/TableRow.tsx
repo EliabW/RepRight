@@ -8,6 +8,8 @@ interface TableRowProps {
   reps: string;
   seconds: number;
   score: number;
+  // click handler for view full report button
+  onViewDetails?: () => void;
 }
 
 export function TableRow({
@@ -16,6 +18,7 @@ export function TableRow({
   reps,
   seconds,
   score,
+  onViewDetails,
 }: TableRowProps) {
   return (
     <Card className="flex items-center justify-between bg-card-secondary rounded-lg p-3 shadow-sm">
@@ -25,15 +28,15 @@ export function TableRow({
           <span className="text-lg font-semibold">{exercise}</span>
           <span className="text-xs text-subheading">{date}</span>
         </div>
-        {/* reps and time */}
-        <div className="flex items-center gap-3">
-          <Card className="px-4 py-2 rounded-full text-md">{reps} reps</Card>
-          <Card className="px-4 py-2 rounded-full text-md">{seconds} sec</Card>
-        </div>
       </div>
 
       {/* score and button */}
       <div className="flex items-center gap-4">
+        {/* reps and time */}
+        <div className="flex items-center gap-3 mr-6">
+          <Card className="px-4 py-2 rounded-full text-md">{reps} reps</Card>
+          <Card className="px-4 py-2 rounded-full text-md">{seconds} sec</Card>
+        </div>
         <ScoreBadge score={score} />
         <FancyButton>View Full Report</FancyButton>
       </div>
