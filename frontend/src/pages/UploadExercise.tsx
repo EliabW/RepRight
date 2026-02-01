@@ -38,7 +38,7 @@ function UploadExercise() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-8 overflow-hidden">
+    <div className="relative mt-20 flex items-center justify-center p-8">
       {exercise && exerciseVideos[exercise] && (
         <video
           key={exercise}
@@ -68,7 +68,7 @@ function UploadExercise() {
       )}
 
       {/* MAIN CARD */}
-      <Card className="relative z-20 w-full max-w-[700px] p-16 shadow-2xl rounded-[40px] animate__animated animate__zoomIn bg-card-primary/60">
+      <Card className="relative w-full max-w-[700px] p-10 shadow-2xl rounded-xl animate__animated animate__zoomIn bg-card-primary/60">
         <h1 className="text-4xl text-primary mb-10 text-center">
           Enter Exercise Information
         </h1>
