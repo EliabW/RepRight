@@ -448,7 +448,7 @@ function Dashboard() {
 
       <div className="flex">
         <h1 className="text-3xl text-secondary pr-2">Welcome back,</h1>
-        <span className="text-3xl text-primary font-bold">
+        <span className="text-3xl text-primary font-bold animate__animated animate__bounce">
           {user?.userGivenName}
         </span>
         <h1 className="text-3xl text-secondary">!</h1>
@@ -456,7 +456,7 @@ function Dashboard() {
       <h2 className="text-sm">Track your progress and improve your form.</h2>
 
       {/* stat cards */}
-      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
+      <div className="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8 animate__animated animate__zoomIn">
         <StatCard
           title="Recent Score"
           value={stats.recentScore}
@@ -477,7 +477,7 @@ function Dashboard() {
         />
       </div>
       {/* performance overview and latest feedback */}
-      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8">
+      <div className="grid lg:grid-cols-2 md:grid-cols-2 sm:grid-cols-1 gap-6 mt-8 animate__animated animate__zoomIn ">
         {/* hide if on mobile */}
         {isDesktop && (
           <Card className="p-4">
@@ -523,7 +523,7 @@ function Dashboard() {
         </Card>
       </div>
       {/* exercise feedback */}
-      <div className="grid grid-cols-1 gap-6 mt-8">
+      <div className="grid grid-cols-1 gap-6 mt-8 animate__animated animate__bounceInLeft animate__delay-1s">
         {/* hide if on mobile */}
         {isDesktop && (
           <Card className="p-4">
