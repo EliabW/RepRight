@@ -1,6 +1,7 @@
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Field, FieldLabel } from "@/components/ui/field";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,8 +9,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import "animate.css";
+import { Button } from "@/components/ui/button";
+
+const exerciseVideos: Record<string, string> = {
+  Squat: "/videos/squat.mp4",
+  Pushup: "/videos/pushup.mp4",
+  Deadlift: "/videos/deadlift.mp4",
+};
 
 function UploadExercise() {
   const navigate = useNavigate();
@@ -25,61 +32,82 @@ function UploadExercise() {
     navigate("/livesession", {
       state: {
         exercise,
-        reps: parseInt(reps), // Convert to number
+        reps: parseInt(reps),
       },
     });
   };
 
   return (
-    <div className="min-h-screen bg-[tertiary] flex items-center justify-center p-4">
-      <Card className="w-full max-w-[600px] p-10 border-0 shadow-2xl rounded-xl bg-card-primary">
-        <h1 className="text-4xl text-center text-primary mb-10">
+    <div className="relative mt-20 flex items-center justify-center p-8">
+      {exercise && exerciseVideos[exercise] && (
+        <video
+          key={exercise}
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="fixed inset-0 w-full h-full object-cover z-0 animate__animated animate__fadeIn"
+        >
+          <source src={exerciseVideos[exercise]} type="video/mp4" />
+        </video>
+      )}
+
+      {!exercise && (
+        <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0">
+          <img
+            src="/android-chrome-512x512.png"
+            alt="RepRight Logo"
+            className="w-[700px] opacity-[0.07] dark:hidden"
+          />
+          <img
+            src="/white-android-chrome-512x512.png"
+            alt="RepRight Logo"
+            className="w-[520px] opacity-[0.1] hidden dark:block"
+          />
+        </div>
+      )}
+
+      {/* MAIN CARD */}
+      <Card className="relative w-full max-w-[700px] p-10 shadow-2xl rounded-xl animate__animated animate__zoomIn bg-card-primary/60">
+        <h1 className="text-4xl text-primary mb-10 text-center">
           Enter Exercise Information
         </h1>
 
-        {/* exercise selection */}
-        <div className="space-y-8">
+        <div className="space-y-10">
+          {/* Exercise Select */}
           <Field className="space-y-2">
             <FieldLabel className="text-xl text-primary">Exercise</FieldLabel>
             <Select value={exercise} onValueChange={setExercise}>
               <SelectTrigger className="w-full h-14 px-5 rounded-xl border-none shadow-inner bg-white">
-                <SelectValue
-                  placeholder="Select the exercise you are performing"
-                  className="text-white"
-                ></SelectValue>
+                <SelectValue placeholder="Select the exercise you are performing" />
               </SelectTrigger>
-              <SelectContent className="bg-white rounded-xl">
-                <SelectItem value="Squat" className="text-xl ">
-                  Squat
-                </SelectItem>
-                <SelectItem value="Pushup" className="text-xl ">
-                  Pushup
-                </SelectItem>
-                <SelectItem value="Deadlift" className="text-xl ">
-                  Deadlift
-                </SelectItem>
+              <SelectContent className="bg-card-primary border border-border rounded-xl">
+                <SelectItem value="Squat">Squat</SelectItem>
+                <SelectItem value="Pushup">Pushup</SelectItem>
+                <SelectItem value="Deadlift">Deadlift</SelectItem>
               </SelectContent>
             </Select>
           </Field>
 
-          {/* reps input */}
+          {/* Reps */}
           <Field className="space-y-2">
             <FieldLabel className="text-xl text-primary">Reps</FieldLabel>
             <input
               type="number"
               placeholder="Number of reps you are attempting"
-              className="w-full h-14 px-5 rounded-xl"
+              className="w-full h-14 px-5 rounded-xl bg-white text-foreground border-none shadow-inner focus:outline-none focus:ring-2 focus:ring-primary"
               value={reps}
               onChange={(e) => setReps(e.target.value)}
-            ></input>
+            />
           </Field>
 
+          {/* CTA */}
           <Button
-            type="submit"
-            className="w-full h-16 text-xl shadow-md rounded-xl"
+            className="w-full h-16 text-lg rounded-xl shadow-lg"
+            disabled={!exercise || !reps}
             onClick={handleStart}
           >
-            Start
+            Start Workout
           </Button>
         </div>
       </Card>
