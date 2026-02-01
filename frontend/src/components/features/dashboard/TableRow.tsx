@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { FancyButton } from "@/components/ui/fancybutton";
 import { ScoreBadge } from "./ScoreBadge";
 import { Card } from "@/components/ui/card";
 
@@ -38,7 +38,7 @@ export function TableRow({
           <Card className="px-4 py-2 rounded-full text-md">{seconds} sec</Card>
         </div>
         <ScoreBadge score={score} />
-        <Button onClick={onViewDetails}>View Full Report</Button>
+        <FancyButton>View Full Report</FancyButton>
       </div>
     </Card>
   );

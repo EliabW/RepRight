@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* light mode*/
+  --primary: 67 47 30;
+  --primary-foreground: 255 255 255;
+  --secondary: 67 47 30;
+  --secondary-foreground: 255 255 255;
+  --tertiary: 243 231 222;
+  --subheading: 143 94 56;
+  --subtle: 235 221 210;
+
+  --neutral-primary: 143 94 56;
+  --neutral-secondary: 255 255 255;
+  --neutral-tertiary: 235 221 210;
+  --neutral-standard: 243 231 222;
+
+  --card-primary: 252 243 239;
+  --card-secondary: 255 251 248;
+
+  --warning: 201 109 109;
+  --warning-foreground: 255 255 255;
+
+  /* mappings for shadcn/ui */
+  --background: 243 231 222;
+  --foreground: 67 47 30;
+  --card: 252 243 239;
+  --card-foreground: 67 47 30;
+  --popover: 255 255 255;
+  --popover-foreground: 67 47 30;
+  --muted: 243 231 222;
+  --muted-foreground: 179 179 179;
+  --accent: 243 231 222;
+  --accent-foreground: 67 47 30;
+  --destructive: 201 109 109;
+  --destructive-foreground: 255 255 255;
+  --border: 235 221 210;
+  --input: 235 221 210;
+  --ring: 235 221 210;
+  --radius: 0.5rem;
+}
+
+:root.dark {
+  /* dark mode */
+  --primary: 151 110 76;
+  --primary-foreground: 255 255 255;
+  --secondary: 151 110 76;
+  --secondary-foreground: 255 255 255;
+  --tertiary: 25 17 11;
+  --subheading: 255 255 255;
+  --subtle: 151 110 76;
+
+  --neutral-primary: 151 110 76;
+  --neutral-secondary: 25 17 11;
+  --neutral-tertiary: 91 64 41;
+  --neutral-standard: 25 17 11;
+
+  --card-primary: 67 47 30;
+  --card-secondary: 91 64 41;
+
+  --warning: 201 109 109;
+  --warning-foreground: 255 255 255;
+
+  /* mappings for dark mode */
+  --background: 25 17 11;
+  --foreground: 255 255 255;
+  --card: 67 47 30;
+  --card-foreground: 255 255 255;
+  --popover: 25 17 11;
+  --popover-foreground: 255 255 255;
+  --muted: 25 17 11;
+  --muted-foreground: 151 110 76;
+  --accent: 67 47 30;
+  --accent-foreground: 255 255 255;
+  --destructive: 201 109 109;
+  --destructive-foreground: 255 255 255;
+  --border: 151 110 76;
+  --input: 151 110 76;
+  --ring: 151 110 76;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Inter", sans-serif;
+  }
+}
+
+/* used for gradient on auth cards */
+@layer utilities {
+  .bg-gradient-card {
+    background: linear-gradient(
+      to bottom,
+      rgb(var(--neutral-standard)),
+      rgb(var(--tertiary))
+    );
+  }
+}

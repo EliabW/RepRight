@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button";
+import { FancyButton } from "@/components/ui/fancybutton";
 import { ScoreBadge } from "./ScoreBadge";
 
 interface FeedbackCardProps {
@@ -25,16 +25,16 @@ export function FeedbackCard({
         className="w-full sm:w-52 h-52 rounded-xl object-cover"
       />
 
-      {/* info section */}
       <div className="flex flex-col flex-1 justify-between">
         <h3 className="text-2xl font-semibold">{exercise} Analysis</h3>
         <div className="flex">
           <ScoreBadge score={score} />
         </div>
 
-        {/* feedback (full width, below top row) */}
         <p className="text-sm text-subheading pb-5">{feedback}</p>
-        <Button onClick={onViewDetails}>View Full Report</Button>
+        
+        {/* Replace the old Button with "FancyButton" */}
+        <FancyButton>View Full Report</FancyButton>
       </div>
     </div>
   );

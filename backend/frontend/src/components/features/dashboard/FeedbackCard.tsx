@@ -1,0 +1,38 @@
+import { Button } from "@/components/ui/button";
+import { ScoreBadge } from "./ScoreBadge";
+
+interface FeedbackCardProps {
+  exercise: string;
+  feedback: string;
+  imageSrc: string;
+  score: number;
+}
+
+export function FeedbackCard({
+  exercise,
+  feedback,
+  imageSrc,
+  score,
+}: FeedbackCardProps) {
+  return (
+    <div className="bg-card-secondary border border-subtle p-6 rounded-xl flex flex-col sm:flex-row gap-6">
+      <img
+        src={imageSrc}
+        alt={exercise}
+        className="w-full sm:w-52 h-52 rounded-xl object-cover"
+      />
+
+      {/* info section */}
+      <div className="flex flex-col flex-1 justify-between">
+        <h3 className="text-2xl font-semibold">{exercise} Analysis</h3>
+        <div className="flex">
+          <ScoreBadge score={score} />
+        </div>
+
+        {/* feedback (full width, below top row) */}
+        <p className="text-sm text-subheading pb-5">{feedback}</p>
+        <Button>View Full Report</Button>
+      </div>
+    </div>
+  );
+}

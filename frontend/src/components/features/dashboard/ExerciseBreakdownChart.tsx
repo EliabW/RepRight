@@ -15,6 +15,7 @@ interface ExerciseBreakdownChartProps {
 }
 
 // color palette for bars
+
 const colors = [
   "#ef4444",
   "#3b82f6",
@@ -53,6 +54,7 @@ export function ExerciseBreakdownChart({
       </div>
     );
   }
+
 
   return (
     <ResponsiveContainer width="100%" height="100%">
