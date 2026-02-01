@@ -78,6 +78,14 @@ function Dashboard() {
     };
 
     fetchSessions();
+    if (id > 0) {
+      for (const item of sessions) {
+        if (item.sessionID === id) {
+          setSelectedSession(item);
+        }
+      }
+      setIsDialogOpen(true);
+    }
   }, []);
 
   const { user } = useAuth();
