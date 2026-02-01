@@ -8,7 +8,7 @@ import { TableRow } from "@/components/features/dashboard/TableRow";
 import { FormScoreProgressChart } from "@/components/features/dashboard/FormScoreProgressChart";
 import { ExerciseBreakdownChart } from "@/components/features/dashboard/ExerciseBreakdownChart";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { sessionService } from "@/services/sessionService";
 import type { SessionResponse } from "@/types/session";
 import p5 from "p5";
@@ -59,6 +59,34 @@ const exerciseImageMap: Record<string, string> = {
   BenchPress: "../../images/benchpress.png",
 };
 
+const SKELETON_CONNECTIONS = [
+  // Head
+  ["nose", "left_eye"],
+  ["nose", "right_eye"],
+  ["left_eye", "left_ear"],
+  ["right_eye", "right_ear"],
+  ["nose", "left_shoulder"],
+  ["nose", "right_shoulder"],
+
+  // Arms
+  ["left_shoulder", "left_elbow"],
+  ["left_elbow", "left_wrist"],
+  ["right_shoulder", "right_elbow"],
+  ["right_elbow", "right_wrist"],
+
+  // Torso
+  ["left_shoulder", "right_shoulder"],
+  ["left_hip", "right_hip"],
+  ["left_shoulder", "left_hip"],
+  ["right_shoulder", "right_hip"],
+
+  // Legs
+  ["left_hip", "left_knee"],
+  ["left_knee", "left_ankle"],
+  ["right_hip", "right_knee"],
+  ["right_knee", "right_ankle"],
+];
+
 const getExerciseImage = (exerciseType: string): string => {
   return exerciseImageMap[exerciseType] || "../../images/default-exercise.png";
 };
@@ -75,6 +103,9 @@ function Dashboard() {
   const [viewMode, setViewMode] = useState<"progression" | "reps">(
     "progression",
   );
+  const ghostFrameIndex = useRef<number>(0);
+  const ghost = useRef<unknown[]>([]);
+  const displayGhost = useRef<boolean>(false);
 
   useEffect(() => {
     if (location.state?.newId) {
@@ -165,15 +196,63 @@ function Dashboard() {
   };
 
   const draw = (p5: p5) => {
-    const video = false;
-
-    if (!video) {
+    if (!displayGhost.current) {
       p5.background(0);
       p5.fill(255);
-      p5.textSize(24);
-      p5.text("Loading video...", 20, p5.height / 2);
+      p5.textSize(16);
+      p5.textAlign(p5.CENTER, p5.CENTER);
+      p5.text("Click a rep to view replay", p5.width / 2, p5.height / 2);
       return;
     }
+
+    p5.background(220);
+
+    const currentIndex = ghostFrameIndex.current;
+    const pose = ghost.current[currentIndex] as Pose;
+    if (!pose || !pose.keypoints) return;
+
+    // ───────── DRAW KEYPOINTS ─────────
+    for (const kp of pose.keypoints) {
+      if (!kp.x || !kp.y) continue;
+
+      p5.noStroke();
+      p5.fill(0, 0, 255);
+      p5.circle(kp.x * 350, kp.y * 200, 8);
+    }
+
+    // ───────── DRAW SKELETON ─────────
+    p5.stroke(255, 0, 0);
+    p5.strokeWeight(2);
+
+    // Helper function to normalize keypoint names for comparison
+    const normalizeKeypointName = (name: string) => {
+      return name.toLowerCase().replace(/_/g, "");
+    };
+
+    for (const [jointA, jointB] of SKELETON_CONNECTIONS) {
+      const normalizedJointA = normalizeKeypointName(jointA);
+      const normalizedJointB = normalizeKeypointName(jointB);
+
+      const a = pose.keypoints.find(
+        (kp) => normalizeKeypointName(kp.name) === normalizedJointA,
+      );
+      const b = pose.keypoints.find(
+        (kp) => normalizeKeypointName(kp.name) === normalizedJointB,
+      );
+
+      if (a && b && a.x && a.y && b.x && b.y) {
+        p5.line(
+          a.x * p5.width,
+          a.y * p5.height,
+          b.x * p5.width,
+          b.y * p5.height,
+        );
+      }
+    }
+
+    // Auto-advance frame
+    ghostFrameIndex.current =
+      (ghostFrameIndex.current + 1) % ghost.current.length;
   };
 
   const preload = () => {
@@ -189,6 +268,8 @@ function Dashboard() {
     return selectedSession.reps.map((rep) => ({
       rep: `Rep ${rep.repNumber}`,
       score: rep.repScore ?? 0,
+      repId: rep.repID,
+      repFrames: rep.frames,
     }));
   };
 
@@ -235,7 +316,7 @@ function Dashboard() {
 
           <div className="w-[100%] h-px bg-subtle rounded-full"></div>
           <h1 className="text-lg font-bold">Feedback</h1>
-          <p className="max-w-xs">
+          <p className="">
             {selectedSession?.sessionFeedback ||
               "No feedback available for this session."}
           </p>
@@ -286,7 +367,70 @@ function Dashboard() {
                       <XAxis dataKey="rep" />
                       <YAxis domain={[0, 10]} />
                       <Tooltip />
-                      <Bar dataKey="score" fill="#976E4C" cursor="pointer" />
+                      <Bar
+                        dataKey="score"
+                        fill="#976E4C"
+                        cursor="pointer"
+                        onClick={(data: any, index) => {
+                          // console.log(data.repFrames);
+
+                          // Convert the frame data to the format expected by the ghost
+                          if (data.repFrames && data.repFrames.length > 0) {
+                            // Transform the frame data into Pose objects
+                            const poses = data.repFrames.map((frame: any) => {
+                              // Extract keypoints from the frame object
+                              const keypoints: Keypoint[] = [];
+
+                              // Map all possible keypoint properties to an array
+                              const keypointNames = [
+                                "nose",
+                                "leftEye",
+                                "rightEye",
+                                "leftEar",
+                                "rightEar",
+                                "leftShoulder",
+                                "rightShoulder",
+                                "leftElbow",
+                                "rightElbow",
+                                "leftWrist",
+                                "rightWrist",
+                                "leftHip",
+                                "rightHip",
+                                "leftKnee",
+                                "rightKnee",
+                                "leftAnkle",
+                                "rightAnkle",
+                              ];
+
+                              keypointNames.forEach((name) => {
+                                const kp = frame[name];
+                                if (kp) {
+                                  keypoints.push({
+                                    name: kp.name || name,
+                                    x: kp.x,
+                                    y: kp.y,
+                                    confidence: kp.confidence || 1,
+                                  });
+                                }
+                              });
+
+                              return {
+                                keypoints,
+                                skeleton: [], // Not needed for visualization
+                              } as Pose;
+                            });
+
+                            // Set the ghost data
+                            ghost.current = poses;
+                            ghostFrameIndex.current = 0;
+                            displayGhost.current = true;
+
+                            console.log(
+                              `Loaded ${poses.length} frames for replay`,
+                            );
+                          }
+                        }}
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (

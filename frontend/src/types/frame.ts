@@ -26,7 +26,7 @@ export interface FrameResponse {
 }
 
 export interface CreateFrameRequest {
-  frameID: number;
+  frameNumber: number;
   nose?: KeypointData;
   leftEye?: KeypointData;
   rightEye?: KeypointData;

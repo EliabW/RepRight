@@ -34,12 +34,14 @@ interface Pose {
   keypoints: Keypoint[];
   skeleton: unknown[][];
 }
+
 interface ML5BodyPose {
   detectStart: (
     video: HTMLVideoElement,
     callback: (results: Pose[]) => void,
   ) => Promise<void>;
 }
+
 declare global {
   interface Window {
     ml5: {
@@ -48,6 +50,39 @@ declare global {
   }
 }
 
+// Updated interface to match backend expectations
+interface KeypointData {
+  name: string;
+  x: number;
+  y: number;
+  confidence: number;
+}
+
+interface CapturedFrame {
+  frameNumber: number;
+  nose?: KeypointData;
+  leftEye?: KeypointData;
+  rightEye?: KeypointData;
+  leftEar?: KeypointData;
+  rightEar?: KeypointData;
+  leftShoulder?: KeypointData;
+  rightShoulder?: KeypointData;
+  leftElbow?: KeypointData;
+  rightElbow?: KeypointData;
+  leftWrist?: KeypointData;
+  rightWrist?: KeypointData;
+  leftHip?: KeypointData;
+  rightHip?: KeypointData;
+  leftKnee?: KeypointData;
+  rightKnee?: KeypointData;
+  leftAnkle?: KeypointData;
+  rightAnkle?: KeypointData;
+}
+
+interface CapturedRep {
+  score: number;
+  frames: CapturedFrame[];
+}
 function LiveSession() {
   // these will eventually be fetched from the database
   const navigate = useNavigate();
@@ -79,6 +114,7 @@ function LiveSession() {
   const scores = useRef<number[]>([]);
   const startTimeRef = useRef<number>(0); // Initialize with 0 or null
   const doneRef = useRef(false);
+  const capturedRepsRef = useRef<CapturedRep[]>([]);
 
   useEffect(() => {
     startTimeRef.current = Date.now(); // Initialize when component mounts
@@ -291,7 +327,87 @@ function LiveSession() {
                   collectedFramesRef.current,
                   150,
                 );
+                // Convert ghost poses to frame data matching backend schema
+                const frameData: CapturedFrame[] = ghost.current.map(
+                  (poseData: any, index: number) => {
+                    const pose = poseData as Pose;
+                    const frame: CapturedFrame = {
+                      frameNumber: index + 1,
+                    };
+
+                    // Map each keypoint to the corresponding property
+                    pose.keypoints.forEach((kp) => {
+                      const keypointData: KeypointData = {
+                        name: kp.name,
+                        x: kp.x / p5.windowWidth,
+                        y: kp.y / p5.windowHeight,
+                        confidence: kp.confidence,
+                      };
+
+                      // Map to the correct property based on keypoint name
+                      switch (kp.name.toLowerCase().replace(/_/g, "")) {
+                        case "nose":
+                          frame.nose = keypointData;
+                          break;
+                        case "lefteye":
+                          frame.leftEye = keypointData;
+                          break;
+                        case "righteye":
+                          frame.rightEye = keypointData;
+                          break;
+                        case "leftear":
+                          frame.leftEar = keypointData;
+                          break;
+                        case "rightear":
+                          frame.rightEar = keypointData;
+                          break;
+                        case "leftshoulder":
+                          frame.leftShoulder = keypointData;
+                          break;
+                        case "rightshoulder":
+                          frame.rightShoulder = keypointData;
+                          break;
+                        case "leftelbow":
+                          frame.leftElbow = keypointData;
+                          break;
+                        case "rightelbow":
+                          frame.rightElbow = keypointData;
+                          break;
+                        case "leftwrist":
+                          frame.leftWrist = keypointData;
+                          break;
+                        case "rightwrist":
+                          frame.rightWrist = keypointData;
+                          break;
+                        case "lefthip":
+                          frame.leftHip = keypointData;
+                          break;
+                        case "righthip":
+                          frame.rightHip = keypointData;
+                          break;
+                        case "leftknee":
+                          frame.leftKnee = keypointData;
+                          break;
+                        case "rightknee":
+                          frame.rightKnee = keypointData;
+                          break;
+                        case "leftankle":
+                          frame.leftAnkle = keypointData;
+                          break;
+                        case "rightankle":
+                          frame.rightAnkle = keypointData;
+                          break;
+                      }
+                    });
+
+                    return frame;
+                  },
+                );
+                console.log("Frame data sample:", frameData[0]); // Log first frame to verify structure
+
                 collectedFramesRef.current = [];
+                ghost.current = []; // Clear ghost for next rep
+
                 const predition = await pushup.predict(normalizedSequence);
                 console.log("Prediction:", predition);
 
@@ -305,6 +421,11 @@ function LiveSession() {
                   const rounded = parseFloat(mul.toFixed(1));
 
                   scores.current.push(rounded);
+
+                  capturedRepsRef.current.push({
+                    score: rounded,
+                    frames: frameData,
+                  });
                 }
 
                 if (counterRef.current === reps) submit();
@@ -412,38 +533,24 @@ function LiveSession() {
     const avg = sum / scores.current.length;
     const finalElapsedTime = Math.floor(
       (Date.now() - startTimeRef.current) / 1000,
-    ); // Calculate directly
+    );
 
     const data = await sessionService.createSession({
       sessionType: exercise,
       sessionReps: counterRef.current,
       sessionScore: avg,
-      reps: scores.current.map((score, index) => ({
+      reps: capturedRepsRef.current.map((capturedRep, index) => ({
         repNumber: index + 1,
-        repScore: score,
-        frames: [],
+        repScore: capturedRep.score,
+        frames: capturedRep.frames,
       })),
-
-      // sessionScore: 0, // Default score, can be calculated based on form
-      sessionFeedback: getPushupFeedback(avg), // Default feedback
+      sessionFeedback: getPushupFeedback(avg),
       sessionDurationSec: finalElapsedTime,
     });
-    //   .then((data) => {
 
     setTimeout(() => {
       navigate("/dashboard", { state: { newId: data.sessionID } });
-    }, 80); // 80 milliseconds = 0.08 seconds
-    //   })
-    //   .catch((err) => {
-    //     console.error(err);
-    //   });
-
-    // .then((data) => {
-    //   navigate("/dashboard", { state: { newId: data.sessionID } });
-    // })
-    // .catch((err) => {
-    //   console.error(err);
-    // });
+    }, 80);
   };
 
   return (
