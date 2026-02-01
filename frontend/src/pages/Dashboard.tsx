@@ -54,7 +54,7 @@ const getExerciseImage = (exerciseType: string): string => {
 
 function Dashboard() {
   const location = useLocation();
-  const id: number = location.state?.id || 0;
+  const id: number = location.state?.newId || 0;
   const [sessions, setSessions] = useState<SessionResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,11 +62,16 @@ function Dashboard() {
     useState<SessionResponse | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   useEffect(() => {
+    if (location.state?.newId) {
+      window.history.replaceState({}, document.title);
+    }
+
+    let sessions = [];
     const fetchSessions = async () => {
       try {
         setIsLoading(true);
         // fetch sessions from the currently logged in user
-        const sessions = await sessionService.getAllSessions();
+        sessions = await sessionService.getAllSessions();
         setSessions(sessions);
         setError(null);
       } catch (error) {
@@ -77,15 +82,18 @@ function Dashboard() {
       }
     };
 
-    fetchSessions();
-    if (id > 0) {
-      for (const item of sessions) {
-        if (item.sessionID === id) {
-          setSelectedSession(item);
+    fetchSessions().then(() => {
+      if (id > 0) {
+        console.log(id, sessions.length);
+        for (const item of sessions) {
+          console.log(item.sessionID);
+          if (item.sessionID === id) {
+            setSelectedSession(item);
+          }
         }
+        setIsDialogOpen(true);
       }
-      setIsDialogOpen(true);
-    }
+    });
   }, []);
 
   const { user } = useAuth();
