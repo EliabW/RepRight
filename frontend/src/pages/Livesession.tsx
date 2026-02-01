@@ -22,7 +22,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import pushup from "@/components/features/models/pushup/pushup";
 import { Button } from "@/components/ui/button";
 import { sessionService } from "@/services/sessionService";
-import { math, round } from "@tensorflow/tfjs";
+import { _FusedMatMul, math, round } from "@tensorflow/tfjs";
 interface Keypoint {
   x: number;
   y: number;
@@ -77,11 +77,14 @@ function LiveSession() {
   const [elapsedTime, setElapsedTime] = useState(0);
   const isMountedRef = useRef(true);
   const scores = useRef<number[]>([]);
+  const startTimeRef = useRef<number>(0); // Initialize with 0 or null
+  const doneRef = useRef(false);
 
   useEffect(() => {
-    const start = Date.now();
+    startTimeRef.current = Date.now(); // Initialize when component mounts
+
     const interval = setInterval(() => {
-      const seconds = Math.floor((Date.now() - start) / 1000);
+      const seconds = Math.floor((Date.now() - startTimeRef.current) / 1000);
       setElapsedTime(seconds);
     }, 1000);
 
@@ -104,6 +107,16 @@ function LiveSession() {
     const m = Math.floor(s / 60);
     const sec = s % 60;
     return `${m}:${sec.toString().padStart(2, "0")}`;
+  };
+
+  const playError = () => {
+    const audio = new Audio("/fail.mp3");
+    audio.play();
+  };
+
+  const playSuccess = () => {
+    const audio = new Audio("/success.mp3");
+    audio.play();
   };
 
   const preload = async () => {
@@ -157,6 +170,24 @@ function LiveSession() {
       `✅ Saved! Good: ${data.good_forms.length}, Bad: ${data.bad_forms.length}`,
     );
   }
+
+  function getPushupFeedback(score: number): string {
+    if (score < 3) {
+      return "Your push-up form needs significant improvement. Focus on maintaining a straight body line, controlling your movement, and completing the full range of motion. Prioritize proper technique over speed.";
+    }
+
+    if (score < 6) {
+      return "You’re showing some correct mechanics, but consistency and control are lacking. Work on engaging your core, lowering fully, and pushing up evenly throughout each rep.";
+    }
+
+    if (score < 8) {
+      return "Solid effort overall. Most reps show good form, but there are minor inconsistencies in alignment or depth. Focus on staying consistent from start to finish.";
+    }
+
+    // 8–10
+    return "Great job! Your push-ups demonstrate strong form, control, and consistency. You maintain proper alignment and complete each rep cleanly. Keep up the excellent work.";
+  }
+
   const videoLoaded = async (p5: p5) => {
     console.log("Video loaded!");
 
@@ -189,6 +220,9 @@ function LiveSession() {
             async (results: Pose[]) => {
               if (!isMountedRef.current) {
                 console.log("stuck");
+                return;
+              }
+              if (doneRef.current) {
                 return;
               }
 
@@ -250,6 +284,7 @@ function LiveSession() {
                 console.log("✅ REP COMPLETE!");
                 console.log(`Frames: ${collectedFramesRef.current.length}`);
                 counterRef.current++;
+
                 setRepCount(counterRef.current);
 
                 const normalizedSequence = pushup.resampleFrames(
@@ -259,12 +294,20 @@ function LiveSession() {
                 collectedFramesRef.current = [];
                 const predition = await pushup.predict(normalizedSequence);
                 console.log("Prediction:", predition);
+
                 if (predition) {
+                  if (predition <= 0.5) {
+                    playError();
+                  } else {
+                    playSuccess();
+                  }
                   const mul = predition * 10;
                   const rounded = parseFloat(mul.toFixed(1));
 
                   scores.current.push(rounded);
                 }
+
+                if (counterRef.current === reps) submit();
 
                 // done = true;
               }
@@ -333,6 +376,8 @@ function LiveSession() {
 
     const pose = posesRef.current[0];
 
+    // console.log(pose.keypoints);
+
     for (const kp of pose.keypoints) {
       if (kp.name === "left_eye") {
         lefteyeRef.current = kp;
@@ -357,16 +402,44 @@ function LiveSession() {
       );
     }
 
-    p5.noStroke();
-    p5.fill(0, 255, 0);
-    p5.textSize(32);
-    p5.text(`Reps: ${counterRef.current}`, 10, 40);
-
-    p5.fill(0, 0, 0);
-    p5.noStroke();
-    p5.text(`Status: ${readyRef.current}`, 10, 80);
-
     // console.log(detectPushupState(pose));
+  };
+
+  const submit = async () => {
+    doneRef.current = true;
+
+    const sum = scores.current.reduce((acc, val) => acc + val, 0);
+    const avg = sum / scores.current.length;
+    const finalElapsedTime = Math.floor(
+      (Date.now() - startTimeRef.current) / 1000,
+    ); // Calculate directly
+
+    const data = await sessionService.createSession({
+      sessionType: exercise,
+      sessionReps: counterRef.current,
+      sessionScore: avg,
+      repScores: scores.current,
+
+      // sessionScore: 0, // Default score, can be calculated based on form
+      sessionFeedback: getPushupFeedback(avg), // Default feedback
+      sessionDurationSec: finalElapsedTime,
+    });
+    //   .then((data) => {
+
+    setTimeout(() => {
+      navigate("/dashboard", { state: { newId: data.sessionID } });
+    }, 80); // 80 milliseconds = 0.08 seconds
+    //   })
+    //   .catch((err) => {
+    //     console.error(err);
+    //   });
+
+    // .then((data) => {
+    //   navigate("/dashboard", { state: { newId: data.sessionID } });
+    // })
+    // .catch((err) => {
+    //   console.error(err);
+    // });
   };
 
   return (
@@ -379,32 +452,7 @@ function LiveSession() {
         <Card className="bg-card-secondary p-4 w-64 rounded-xl">
           <p>Time Elapsed: {formatTime(elapsedTime)}</p>
           <p>Reps: {repCount}</p>
-          <Button
-            className="mt-2"
-            onClick={async () => {
-              const sum = scores.current.reduce((acc, val) => acc + val, 0);
-              const avg = sum / scores.current.length;
-
-              const data = await sessionService.createSession({
-                sessionType: exercise,
-                sessionReps: repCount,
-                sessionScore: avg,
-                repScores: scores.current,
-
-                // sessionScore: 0, // Default score, can be calculated based on form
-                // sessionFeedback: "", // Default feedback
-                sessionDurationSec: elapsedTime,
-              });
-
-              navigate("/dashboard", { state: { newId: data.sessionID } });
-              // .then((data) => {
-              //   navigate("/dashboard", { state: { newId: data.sessionID } });
-              // })
-              // .catch((err) => {
-              //   console.error(err);
-              // });
-            }}
-          >
+          <Button className="mt-2" onClick={submit}>
             Finish Session
           </Button>
         </Card>
