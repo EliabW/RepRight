@@ -1,3 +1,4 @@
+using System.Text.Json;
 using backend.Data;
 using backend.DTOs;
 using backend.Filters;
@@ -43,9 +44,13 @@ public class SessionsController : ControllerBase
             return NotFound(new { message = "User not found." });
         }
 
-        var sessions = await _context
+        // First, get the raw sessions from the database
+        var sessionsData = await _context
             .Sessions.Where(s => s.UserID == userId)
             .OrderByDescending(s => s.StartTime)
+            .ToListAsync();
+
+        var sessions = sessionsData
             .Select(s => new SessionResponse
             {
                 SessionID = s.SessionID,
@@ -55,8 +60,12 @@ public class SessionsController : ControllerBase
                 SessionScore = s.SessionScore,
                 SessionFeedback = s.SessionFeedback,
                 SessionDurationSec = s.SessionDurationSec,
+                RepScores =
+                    s.RepScores != null
+                        ? JsonSerializer.Deserialize<List<double>>(s.RepScores)
+                        : null,
             })
-            .ToListAsync();
+            .ToList();
 
         return Ok(sessions);
     }
@@ -92,6 +101,8 @@ public class SessionsController : ControllerBase
             SessionScore = request.SessionScore ?? 0.0,
             SessionFeedback = request.SessionFeedback ?? "",
             SessionDurationSec = request.SessionDurationSec ?? 0,
+            RepScores =
+                request.RepScores != null ? JsonSerializer.Serialize(request.RepScores) : null,
         };
 
         _context.Sessions.Add(session);
@@ -107,6 +118,10 @@ public class SessionsController : ControllerBase
                 SessionScore = session.SessionScore,
                 SessionFeedback = session.SessionFeedback,
                 SessionDurationSec = session.SessionDurationSec,
+                RepScores =
+                    session.RepScores != null
+                        ? JsonSerializer.Deserialize<List<double>>(session.RepScores)
+                        : null,
             }
         );
     }
@@ -144,6 +159,10 @@ public class SessionsController : ControllerBase
                 SessionScore = session.SessionScore,
                 SessionFeedback = session.SessionFeedback,
                 SessionDurationSec = session.SessionDurationSec,
+                RepScores =
+                    session.RepScores != null
+                        ? JsonSerializer.Deserialize<List<double>>(session.RepScores)
+                        : null,
             }
         );
     }

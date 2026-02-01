@@ -29,6 +29,9 @@ public class Sessions
 
     public int SessionDurationSec { get; set; } = 0;
 
+    [Column(TypeName = "json")]
+    public string? RepScores { get; set; }
+
     [ForeignKey("UserID")]
     public User? User { get; set; }
 }

@@ -7,6 +7,7 @@ export interface Session {
   sessionScore: number | null;
   sessionFeedback: string | null;
   sessionDurationSec: number;
+  repScores?: number[];
 }
 
 export interface SessionResponse {
@@ -17,6 +18,7 @@ export interface SessionResponse {
   sessionScore: number;
   sessionFeedback: string;
   sessionDurationSec: number;
+  repScores: number[];
 }
 
 export interface CreateSessionRequest {
@@ -26,6 +28,7 @@ export interface CreateSessionRequest {
   sessionScore?: number;
   sessionFeedback?: string;
   sessionDurationSec?: number;
+  repScores?: number[];
 }
 
 export interface UpdateSessionRequest {
@@ -35,4 +38,5 @@ export interface UpdateSessionRequest {
   sessionScore?: number;
   sessionFeedback?: string;
   sessionDurationSec?: number;
+  repScores?: number[];
 }
