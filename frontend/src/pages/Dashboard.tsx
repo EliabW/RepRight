@@ -278,7 +278,14 @@ function Dashboard() {
                       <XAxis dataKey="rep" />
                       <YAxis domain={[0, 10]} />
                       <Tooltip />
-                      <Bar dataKey="score" fill="#976E4C" />
+                      <Bar
+                        dataKey="score"
+                        fill="#976E4C"
+                        onClick={(data, index) => {
+                          console.log("Clicked bar:", data, "Index:", index);
+                        }}
+                        cursor="pointer"
+                      />
                     </BarChart>
                   </ResponsiveContainer>
                 ) : (
