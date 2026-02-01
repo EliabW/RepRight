@@ -62,11 +62,11 @@ function About() {
       </p>
 
       {/* "demo" place holder */}
-      <div className="w-full aspect-video bg-subheading rounded-[2rem] flex items-center justify-center">
+      {/* <div className="w-full aspect-video bg-subheading rounded-[2rem] flex items-center justify-center">
         <h3 className="text-secondary text-4xl font-semibold text-center">
           DEMO Picture OR Video
         </h3>
-      </div>
+      </div> */}
 
       <br></br>
 
