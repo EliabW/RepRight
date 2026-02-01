@@ -4,8 +4,8 @@ export interface User {
   userFamilyName: string;
   userEmail: string;
   darkMode?: boolean;
-  currentStreak: number;
-  longestStreak: number;
+  currentStreak?: number;
+  longestStreak?: number;
 }
 
 export interface UserResponse {
