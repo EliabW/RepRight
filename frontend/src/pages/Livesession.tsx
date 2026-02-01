@@ -381,27 +381,28 @@ function LiveSession() {
           <p>Reps: {repCount}</p>
           <Button
             className="mt-2"
-            onClick={() => {
+            onClick={async () => {
               const sum = scores.current.reduce((acc, val) => acc + val, 0);
               const avg = sum / scores.current.length;
 
-              sessionService
-                .createSession({
-                  sessionType: exercise,
-                  sessionReps: repCount,
-                  sessionScore: avg,
-                  repScores: scores.current,
+              const data = await sessionService.createSession({
+                sessionType: exercise,
+                sessionReps: repCount,
+                sessionScore: avg,
+                repScores: scores.current,
 
-                  // sessionScore: 0, // Default score, can be calculated based on form
-                  // sessionFeedback: "", // Default feedback
-                  sessionDurationSec: elapsedTime,
-                })
-                .then((data) => {
-                  navigate("/dashboard", { state: { id: data.sessionID } });
-                })
-                .catch((err) => {
-                  console.error(err);
-                });
+                // sessionScore: 0, // Default score, can be calculated based on form
+                // sessionFeedback: "", // Default feedback
+                sessionDurationSec: elapsedTime,
+              });
+
+              navigate("/dashboard", { state: { newId: data.sessionID } });
+              // .then((data) => {
+              //   navigate("/dashboard", { state: { newId: data.sessionID } });
+              // })
+              // .catch((err) => {
+              //   console.error(err);
+              // });
             }}
           >
             Finish Session
