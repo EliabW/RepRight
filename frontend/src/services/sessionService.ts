@@ -1,4 +1,4 @@
-import type { SessionResponse, UpdateSessionRequest } from "@/types/session";
+import type { CreateSessionRequest, SessionResponse, UpdateSessionRequest } from "@/types/session";
 import api from "./api";
 
 export const sessionService = {
@@ -10,14 +10,14 @@ export const sessionService = {
     const response = await api.get<SessionResponse>(`/Sessions/${sessionId}`);
     return response.data;
   },
-  createSession: async () => {
-    const response = await api.post<SessionResponse>(`/Sessions`);
+  createSession: async (sessionData: CreateSessionRequest) => {
+    const response = await api.post<SessionResponse>(`/Sessions`, sessionData);
     return response.data;
   },
-  updateSession: async (sessionId: number, userData: UpdateSessionRequest) => {
+  updateSession: async (sessionId: number, sessionData: UpdateSessionRequest) => {
     const response = await api.put<SessionResponse>(
       `/Sessions/${sessionId}`,
-      userData,
+      sessionData,
     );
     return response.data;
   },

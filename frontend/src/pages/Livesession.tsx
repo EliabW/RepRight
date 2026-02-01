@@ -18,9 +18,11 @@ import {
   DialogOverlay,
 } from "@/components/ui/dialog";
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import pushup from "@/components/features/models/pushup/pushup";
 import { Button } from "@/components/ui/button";
+import { sessionService } from "@/services/sessionService";
+import { math, round } from "@tensorflow/tfjs";
 interface Keypoint {
   x: number;
   y: number;
@@ -48,6 +50,7 @@ declare global {
 
 function LiveSession() {
   // these will eventually be fetched from the database
+  const navigate = useNavigate();
   const location = useLocation();
   const exercise: string = location.state?.exercise || "Pushup";
   const reps: number = location.state?.reps || 10;
@@ -72,16 +75,29 @@ function LiveSession() {
   const ghostFrameIndex = useRef<number>(0);
   const [repCount, setRepCount] = useState(0);
   const [elapsedTime, setElapsedTime] = useState(0);
+  const isMountedRef = useRef(true);
+  const scores = useRef<number[]>([]);
 
   useEffect(() => {
     const start = Date.now();
-
     const interval = setInterval(() => {
       const seconds = Math.floor((Date.now() - start) / 1000);
       setElapsedTime(seconds);
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      isMountedRef.current = false;
+      clearInterval(interval);
+
+      bodyPoseRef.current?.detectStop?.();
+      bodyPoseRef.current = null;
+
+      const video = videoRef.current;
+      if (video?.elt?.srcObject) {
+        const stream = video.elt.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
   }, []);
 
   const formatTime = (s: number) => {
@@ -171,6 +187,11 @@ function LiveSession() {
           await bodyPoseRef.current.detectStart(
             video.elt,
             async (results: Pose[]) => {
+              if (!isMountedRef.current) {
+                console.log("stuck");
+                return;
+              }
+
               posesRef.current = results;
               if (results.length <= 0) return;
               const allPoses = allPosesRef.current;
@@ -238,6 +259,11 @@ function LiveSession() {
                 collectedFramesRef.current = [];
                 const predition = await pushup.predict(normalizedSequence);
                 console.log("Prediction:", predition);
+                if (predition) {
+                  const rounded = Math.round(predition * 10) / 10;
+
+                  scores.current.push(rounded);
+                }
 
                 // done = true;
               }
@@ -280,13 +306,13 @@ function LiveSession() {
     // vid.loop();
     // vid.volume(0);
 
-    // const vid = p5.createCapture((p5 as any).VIDEO, () =>
-    //   videoLoaded(p5),
-    // ) as p5.MediaElement;
-    // videoRef.current = vid;
+    const vid = p5.createCapture((p5 as any).VIDEO, () =>
+      videoLoaded(p5),
+    ) as p5.MediaElement;
+    videoRef.current = vid;
 
-    // vid.size(p5.windowWidth, p5.windowHeight);
-    // vid.hide();
+    vid.size(p5.windowWidth, p5.windowHeight);
+    vid.hide();
   };
 
   const draw = (p5: p5) => {
@@ -352,7 +378,29 @@ function LiveSession() {
         <Card className="bg-card-secondary p-4 w-64 rounded-xl">
           <p>Time Elapsed: {formatTime(elapsedTime)}</p>
           <p>Reps: {repCount}</p>
-          <Button className="mt-2" onClick={() => {}}>
+          <Button
+            className="mt-2"
+            onClick={() => {
+              const sum = scores.current.reduce((acc, val) => acc + val, 0);
+              const avg = sum / scores.current.length;
+
+              sessionService
+                .createSession({
+                  sessionType: exercise,
+                  sessionReps: repCount,
+                  sessionScore: avg,
+                  // sessionScore: 0, // Default score, can be calculated based on form
+                  // sessionFeedback: "", // Default feedback
+                  sessionDurationSec: elapsedTime,
+                })
+                .then((data) => {
+                  navigate("/dashboard", { state: { id: data.sessionID } });
+                })
+                .catch((err) => {
+                  console.error(err);
+                });
+            }}
+          >
             Finish Session
           </Button>
         </Card>

@@ -15,6 +15,7 @@ import p5 from "p5";
 import Sketch from "react-p5";
 import { Dialog, DialogTitle, DialogContent } from "@/components/ui/dialog";
 import { ScoreBadge } from "@/components/features/dashboard/ScoreBadge";
+import { useLocation } from "react-router-dom";
 interface Keypoint {
   x: number;
   y: number;
@@ -52,6 +53,8 @@ const getExerciseImage = (exerciseType: string): string => {
 };
 
 function Dashboard() {
+  const location = useLocation();
+  const id: number = location.state?.id || 0;
   const [sessions, setSessions] = useState<SessionResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
