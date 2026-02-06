@@ -84,7 +84,7 @@ function About() {
             B
           </div>
           <h3 className="font-bold text-secondary text-xl">Braeden Treutel</h3>
-          <p className="text-subheading">FullStack Developer</p>
+          {/* <p className="text-subheading">FullStack Developer</p> */}
         </div>
 
         {/* Eliab */}
@@ -95,7 +95,7 @@ function About() {
           <h3 className="font-bold text-secondary text-xl">
             Eliab Woldegebriel
           </h3>
-          <p className="text-subheading">FullStack Developer</p>
+          {/* <p className="text-subheading">FullStack Developer</p> */}
         </div>
 
         {/* Mario */}
@@ -104,8 +104,20 @@ function About() {
             M
           </div>
           <h3 className="font-bold text-secondary text-xl">Mario Missiha</h3>
-          <p className="text-subheading">FullStack Developer</p>
+          {/* <p className="text-subheading">FullStack Developer</p> */}
+          
         </div>
+        
+          {/* cj */}
+         <div className="text-center">
+          <div className="w-24 h-24 bg-subtle rounded-full mx-auto mb-4 flex items-center justify-center text-white text-2xl font-bold">
+            C
+          </div>
+          <h3 className="font-bold text-secondary text-xl">Chad (CJ) Suttles Jr.</h3>
+          {/* <p className="text-subheading">FullStack Developer</p> */}
+        </div>
+
+
       </div>
     </Card>
   );
